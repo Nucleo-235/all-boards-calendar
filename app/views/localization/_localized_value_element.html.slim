@@ -1,0 +1,5 @@
+- local_assigns[:localized_object] = localized_page.get_value(key, default_value) if !local_assigns[:localized_object]
+- local_assigns[:property] = :value if !local_assigns[:property]
+
+= render(layout: 'inplace/element', :locals => local_assigns) do |args| 
+  = yield args

@@ -1,0 +1,11 @@
+- localized_value = localized_page.get_value(key, default_value)
+- if @is_admin
+  .best_link
+    = best_in_place localized_value, :value, as: :input, :place_holder => "[troque o texto aqui]"
+    = content_tag :a do |el|
+      - attrs.each do |attr_item| el[attr_item[:name]] = attr_item[:value] end
+      i.fa.fa-sign-in
+- else
+  = content_tag :a do |el|
+    - attrs.each do |attr_item| el[attr_item[:name]] = attr_item[:value] end
+    = render partial: 'localization/localized_value', :locals => { localized_page: localized_page, :key => key, default_value: default_value }

@@ -1,0 +1,183 @@
+<% apiFinalURL = (ENV["API_URL"] ? ENV["API_URL"] : "http://localhost:3000/api/v1") %>
+angular.module('MyApp', ['ngResource', 'ngMessages', 'ngAnimate', 'templates', 'toastr', 'ui.router', 'ng-token-auth', 'ui.bootstrap', 'ngFileUpload', 'bootstrapLightbox', 'rails', 'ui.mask', 'ui.bootstrap.showErrors', 'ui.calendar'])
+  .constant('config', {
+      API_URL: "<%= apiFinalURL %>",
+      ROOT_ROUTE: '/home',
+      ROOT_STATE: 'home'
+  })
+  .config(function($stateProvider, $urlRouterProvider, $authProvider, config) {
+    $stateProvider
+      .state('home', {
+        url: '/home',
+        templateUrl: 'home.html',
+        controller: 'HomeCtrl'
+      })
+      .state('logout', {
+        url: '/logout',
+        template: null,
+        controller: 'LogoutCtrl'
+      })
+      .state('logged', {
+        url: '/app',
+        abstract: true,
+        template: '<ui-view/>',
+        resolve: {
+          auth: function($auth, $location, $state) {
+            var response = $auth.validateUser();
+            response.then(function(result) { 
+              return result; 
+            }, function(result) {
+              $state.go('login');
+              return result;
+            });
+            return response;
+          }
+        }
+      })
+      .state('logged.home', {
+        url: '/home',
+        templateUrl: 'home.html',
+        controller: 'HomeCtrl'
+      })
+      .state('logged.admins', {
+        url: '/admins',
+        abstract: true,
+        template: '<ui-view/>'
+      })
+      .state('logged.admins.index', {
+        url: '/',
+        templateUrl: 'admins/index.html',
+        controller: 'AdminIndexCtrl'
+      })
+      .state('logged.admins.new', {
+        url: '/new',
+        templateUrl: 'admins/new.html',
+        controller: 'AdminNewCtrl'
+      })
+      .state('logged.admins.edit', { //state for updating a movie
+        url: '/edit/:id',
+        templateUrl: 'admins/edit.html',
+        controller: 'AdminEditCtrl'
+      });
+      // Exemplo states 
+      // .state('manage.constructors', {
+      //   url: '/constructors',
+      //   abstract: true,
+      //   template: '<ui-view/>'
+      // })
+      // .state('manage.constructors.index', {
+      //   url: '/',
+      //   templateUrl: 'constructors/index.html',
+      //   controller: 'ConstructorIndexCtrl'
+      // })
+      // .state('manage.constructors.new', {
+      //   url: '/new',
+      //   templateUrl: 'constructors/new.html',
+      //   controller: 'ConstructorNewCtrl'
+      // })
+      // .state('manage.constructors.edit', { //state for updating a movie
+      //   url: '/edit/:id',
+      //   templateUrl: 'constructors/edit.html',
+      //   controller: 'ConstructorEditCtrl'
+      // });
+    
+    // Exemplos configuração services/controllers/models CRUD padrao
+    // Entity.addCRUDRoutes($stateProvider, 'DefaultCRUD', 'manage', 'situation_types', 'SituationType');
+    // Entity.addCRUDRoutes($stateProvider, 'DefaultCRUD', 'manage', 'situation_kinds', 'SituationKind');
+    // Entity.addCRUDRoutes($stateProvider, 'DefaultCRUD', 'manage', 'situation_details', 'SituationDetail');
+
+    $urlRouterProvider.otherwise(config.ROOT_ROUTE);
+
+    $authProvider.configure({
+      apiUrl: config.API_URL,
+      omniauthWindowType: 'newWindow',
+      authProviderPaths: {
+        trello: '/auth/trello'
+      }
+    });
+
+    function skipIfLoggedIn($q, $auth) {
+      var deferred = $q.defer();
+      if ($auth.userIsAuthenticated()) {
+        deferred.reject();
+      } else {
+        deferred.resolve();
+      }
+      return deferred.promise;
+    }
+
+    function loginRequired($q, $location, $auth) {
+      var deferred = $q.defer();
+      if ($auth.userIsAuthenticated()) {
+        deferred.resolve();
+      } else {
+        $location.path('/login');
+      }
+      return deferred.promise;
+    }
+  });
+
+angular.module('MyApp')
+  .run(function($rootScope, $location, config) {
+    $rootScope.datepickerPopupOptions = {
+      showButtonBar: false,
+      showWeeks: false,
+      language: 'pt-BR'
+    }; 
+
+    $rootScope.goToRoot = function() {
+      $location.path(config.ROOT_ROUTE);
+    };
+});
+
+
+angular.module('MyApp')
+  .config(function (LightboxProvider, config) {
+    LightboxProvider.templateUrl = 'image-modal.html';
+
+    LightboxProvider.getFileUrl = function(url) {
+      if (url[0] == '/')
+        return config.API_URL + url;
+      else
+        return url;
+    };
+
+    LightboxProvider.getImageUrl = function (image) {
+      return image.hasOwnProperty('uploaded') ? (image.uploaded['$ngfDataUrl'] || LightboxProvider.getFileUrl(image.file.url)) : LightboxProvider.getFileUrl(image.file.url);
+    };
+});
+
+angular.module('MyApp').constant("ROUTE_PREFIX", "manage");
+
+angular.module('MyApp').config(["railsSerializerProvider", "RailsResourceProvider", function(railsSerializerProvider, RailsResourceProvider) {
+    // RailsResourceProvider.extensions('snapshots');
+
+    railsSerializerProvider.underscore(angular.identity).camelize(angular.identity);
+}]);
+
+var SPECIAL_CHARS_REGEXP = /([\:\-\_]+(.))/g;
+var MOZ_HACK_REGEXP = /^moz([A-Z])/;
+
+function camelCase(name) {
+  return name.
+    replace(SPECIAL_CHARS_REGEXP, function(_, separator, letter, offset) {
+      return offset ? letter.toUpperCase() : letter;
+    }).
+    replace(MOZ_HACK_REGEXP, 'Moz$1');
+}
+
+Date.prototype.yyyymmdd = function() {
+   var yyyy = this.getFullYear().toString();
+   var mm = (this.getMonth()+1).toString(); // getMonth() is zero-based
+   var dd  = this.getDate().toString();
+   return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]); // padding
+  };
+
+Array.prototype.first_or_null = function(evCompare) {
+  for (var i = 0; i < this.length; i++) {
+    var item = this[i];
+    if (evCompare(item, i))
+      return item;
+  }
+  return null;
+};

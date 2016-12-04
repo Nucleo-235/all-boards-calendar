@@ -1,0 +1,6 @@
+.best_inplace_group
+  .best_before
+    - if local_assigns[:label]
+      label = local_assigns[:label] + ' '
+    = best_in_place localized_object, property, as: :input, :ok_button => 'Salvar', :cancel_button => 'Cancelar', :place_holder => "[troque o texto aqui]"
+  = yield(local_assigns)

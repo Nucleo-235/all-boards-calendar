@@ -1,0 +1,41 @@
+- form_id = 'image_editor_' + localized_object.id.to_s + '_' + property.to_s
+- image_src = localized_object[property] ? localized_object.send(property.to_s + '_url') : local_assigns[:default_value]
+= simple_form_for(localized_object, html: {id:form_id, :multipart => true, novalidate: true }, :format => :json, :remote => true, authenticity_token: true) do |f|
+  = f.input_field property, as: :file, label: "Trocar Imagem", style: 'display:none'
+  = f.input property.to_s + "_cache", as: :hidden
+  .image-container
+    img.preview.editable-preview src="#{image_src}" style="#{image_src.blank? ? 'display:none' : ''}"
+    - if image_src.blank?
+      a.insert-image href="#" Clique para inserir imagem
+  .actions-container style="display:none;"
+    input.saveButton type="submit" href="#" value="Salvar"
+    input.cancelButton type="button" href="#" value="Cancelar"
+javascript:
+  $(document).ready(function() {
+    var form_id = "#{form_id}";
+    var imageEditor = asyncImageForm({
+      formSelector: 'form#' + form_id,
+      inputFileSelector: 'form#' + form_id + ' input[type=file]',
+      inputSubmitSelector: 'form#' + form_id + ' input[type=submit].saveButton',
+      imagePreviewSelector: 'form#' + form_id + ' img.editable-preview',
+      imageChangerSelector: 'form#' + form_id + ' img.preview, form#' + form_id + ' a.insert-image',
+      errorsGroup: '#{localized_object.class.name.downcase}',
+      events: {
+        imageChanged: function() {
+          $('form#' + form_id + ' a.insert-image').hide();
+          $('form#' + form_id + ' .actions-container').show();
+          $('form#' + form_id + ' .actions-container input').prop('disabled', false);
+        },
+        imageUploading: function() {
+          $('form#' + form_id + ' .actions-container input').prop('disabled', true)
+        },
+        imageUploadSuccess: function() {
+          $('form#' + form_id + ' .actions-container').hide();
+        },
+        imageUploadFail: function() {
+          $('form#' + form_id + ' .actions-container').show();
+          $('form#' + form_id + ' .actions-container input').prop('disabled', false)
+        }
+      }
+    });
+  });

@@ -1,0 +1,8 @@
+- localized_value = localized_page.get_value(key, default_value)
+- if @is_admin
+  .best_link
+    = best_in_place localized_value, :value, as: :input, :place_holder => "[troque o texto aqui]"
+    a href="#{link}"  
+      i.fa.fa-sign-in
+- else
+  a href="#{link}" = render partial: 'localization/localized_value', :locals => { localized_page: localized_page, :key => key, default_value: default_value }

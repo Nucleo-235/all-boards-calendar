@@ -1,0 +1,13 @@
+{
+  "name": "angular-treetable",
+  "homepage": "https://github.com/GarrettHeel/angular-treetable",
+  "_release": "7b79063670",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "7b790636708eaa9ac97a522f06dc59b95bf87bc9"
+  },
+  "_source": "https://github.com/GarrettHeel/angular-treetable.git",
+  "_target": "*",
+  "_originalSource": "angular-treetable"
+}

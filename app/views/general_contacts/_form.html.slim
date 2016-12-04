@@ -1,0 +1,17 @@
+= simple_form_for @general_contact do |f|
+  .form-group
+    = f.label :name
+      = render partial: 'localization/localized_value_edit', :locals => { localized_page: @localized_page, :key => 'contato-name-label', default_value: 'Seu nome' }
+    small.form-text.text-muted = render partial: 'localization/localized_value_edit', :locals => { localized_page: @localized_page, :key => 'contato-name-small', default_value: 'Nome / Sobrenome' }
+    = f.input_field :name, required: true
+  .form-group
+    = f.label :email
+      = render partial: 'localization/localized_value_edit', :locals => { localized_page: @localized_page, :key => 'contato-email-label', default_value: 'Seu e-mail' }
+    small.contato = render partial: 'localization/localized_value_edit', :locals => { localized_page: @localized_page, :key => 'contato-email-small', default_value: 'Seu e-mail para contato' }
+    = f.input_field :email, required: true
+  .form-group
+    = f.label :message, class: 'contato'
+      = render partial: 'localization/localized_value_edit', :locals => { localized_page: @localized_page, :key => 'contato-message-label', default_value: 'Sua Mensagem' }
+    = f.input_field :message, as: :text, class: 'contato', required: true, rows: 5
+  = render layout: 'localization/localized_value_element', :locals => { localized_page: @localized_page, :key => 'contato-send-button', default_value: 'Envie seu e-mail', label: 'Clique no texto abaixo para editar botão:' } do |locals|
+    input.btn.btn-block.btn-primary.btn-contato type="submit" value="#{get_localized_value(locals)}" /

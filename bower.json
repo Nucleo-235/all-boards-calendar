@@ -1,0 +1,33 @@
+{
+  "name": "bower-rails generated vendor assets",
+  "dependencies": {
+    "angular": "^1.5.8",
+    "angular-animate": "^1.5.8",
+    "angular-bootstrap": "^2.0.1",
+    "angular-bootstrap-colorpicker": "^3.0.25",
+    "angular-bootstrap-lightbox": "^0.12.0",
+    "angular-chart.js": "^0.10.2",
+    "angular-cookie": "^4.1.0",
+    "angular-datatables": "^0.5.4",
+    "angular-messages": "^1.5.8",
+    "angular-resource": "^1.5.8",
+    "angular-sanitize": "^1.5.8",
+    "angular-toastr": "^1.7.0",
+    "angular-treetable": "*",
+    "angular-ui-calendar": "^1.0.2",
+    "angular-ui-router": "^0.3.1",
+    "angularjs-rails-resource": "^2.2.0",
+    "Chart.js": "^2.1.6",
+    "datatables": "^1.10.12",
+    "fullcalendar": "^2.9.0",
+    "jquery": "^3.1.0",
+    "moment": "^2.14.1",
+    "ng-file-upload": "^12.0.4",
+    "ng-token-auth": "^0.0.29",
+    "jquery-treetable": "^3.2.0",
+    "bootstrap": "^3.3.6",
+    "jquery-ui": "^1.12.0",
+    "angular-ui-mask": "^1.8.7",
+    "angular-i18n": "^1.5.8"
+  }
+}
