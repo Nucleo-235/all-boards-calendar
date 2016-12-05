@@ -96,7 +96,7 @@ class User < ActiveRecord::Base
   end
 
   def trello_boards(params = {})
-    return Trello::Board.from_response trello_client.get("/members/#{trello_member.username}/boards", params)
+    return Trello::Board.from_response trello_client.get("/members/me/boards", params)
   end
 
   def trello_open_boards
@@ -112,5 +112,9 @@ class User < ActiveRecord::Base
 
   def trello_open_lists(board_id)
     return trello_lists(board_id, {filter: 'open'})
+  end
+
+  def trello_cards(params = {})
+    return Trello::Card.from_response trello_client.get("/members/me/cards", params)
   end
 end
