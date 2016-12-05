@@ -27,28 +27,51 @@ class TrelloProject < Project
 
   after_create :check_for_sync
 
-  def trello_cards_update_actions
-    @trello_cards_update_actions ||= [
+  def self.trello_cards_update_actions
+    @@trello_cards_update_actions ||= [
       "addMemberToCard",
       "convertToCardFromCheckItem",
       "copyCard",
       "createCard",
-      "deleteCard",
-      "moveCardFromBoard",
       "moveCardToBoard",
-      "removeMemberFromCard",
-      "updateCard"
+      "updateCard:closed",
+      "updateList:closed"
     ]
-    @trello_cards_update_actions
+    @@trello_cards_update_actions
   end
 
-  def trello_cards_update_actions_to_s
-    @trello_cards_update_actions_to_s ||= self.trello_cards_update_actions.join(',')
-    @trello_cards_update_actions_to_s
+  def self.trello_cards_update_actions_to_s
+    @@trello_cards_update_actions_to_s ||= self.trello_cards_update_actions.join(',')
+    @@trello_cards_update_actions_to_s
+  end
+
+  def self.trello_cards_delete_actions
+    @@trello_cards_delete_actions ||= [
+      "deleteCard",
+      "moveCardFromBoard",
+      "removeMemberFromCard",
+      "updateCard:closed",
+      "updateList:closed"
+    ]
+    @@trello_cards_delete_actions
+  end
+
+  def self.trello_cards_delete_actions_to_s
+    @@trello_cards_delete_actions_to_s ||= self.trello_cards_delete_actions.join(',')
+    @@trello_cards_delete_actions_to_s
   end
 
   def get_updated_cards
     actions = Trello::Action.from_response user.trello_client.get("/boards/#{info.board_id}/actions", { filter: trello_cards_update_actions_to_s, since: self.last_synced_at.to_s })
+    cards = actions.map do |action|
+      card_id = action.data["card"]["id"]
+      Trello::Card.from_response user.trello_client.get("/cards/#{card_id}")
+    end
+    cards
+  end
+
+  def get_deleted_cards
+    actions = Trello::Action.from_response user.trello_client.get("/boards/#{info.board_id}/actions", { filter: trello_cards_delete_actions_to_s, since: self.last_synced_at.to_s })
     cards = actions.map do |action|
       card_id = action.data["card"]["id"]
       Trello::Card.from_response user.trello_client.get("/cards/#{card_id}")
@@ -114,10 +137,9 @@ class TrelloProject < Project
     end
 
     # synca cards que eram validos mas nao apareceram
-    existing_tasks.each do |task_id|
-      task = Task.find(task_id)
-      trello_card = Trello::Card.from_response user.trello_client.get("/cards/#{task.trello_card_id}")
-      task.update_with_card(trello_card)
+    get_deleted_cards.each do |trello_card|
+      task = self.tasks.find_by(type: TrelloTask.name, trello_card_id: trello_card.id)
+      task.update_with_card(trello_card) if task
     end
 
     self.last_synced_at = lastSync
