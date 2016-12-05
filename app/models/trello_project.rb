@@ -136,10 +136,12 @@ class TrelloProject < Project
       end
     end
 
-    # synca cards que eram validos mas nao apareceram
-    get_deleted_cards.each do |trello_card|
-      task = self.tasks.find_by(type: TrelloTask.name, trello_card_id: trello_card.id)
-      task.update_with_card(trello_card) if task
+    if self.last_synced_at
+      # synca cards que eram validos mas nao apareceram
+      get_deleted_cards.each do |trello_card|
+        task = self.tasks.find_by(type: TrelloTask.name, trello_card_id: trello_card.id)
+        task.update_with_card(trello_card) if task
+      end
     end
 
     self.last_synced_at = lastSync
