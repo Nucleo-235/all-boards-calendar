@@ -8,23 +8,35 @@ class ProjectSyncer
     # Cria o cron worker novamente para o dia de amanha
     ProjectSyncer.start
 
-    Project.all.each do |project|
-      Project.delay.sync_project(project.id)
-    end
-
+    diff = 30.seconds
+    delay = 0
     User.all.each do |user|
       if user.trello_client
-        user.trello_open_boards.each do |board|
-          if TrelloProjectInfo.where(board_id: board.id).length == 0
-            project = TrelloProject.new({name: board.name, description: board.description, info_attributes: {board_id: board.id}})
-            project.user = user
-            project.save!
-          end
-        end
+        delay = delay + diff
+        ProjectSyncer.delay_for(delay).sync_user(user.id)
       end
     end
 
     puts "Sidekiq for ProjectSyncer FINISHED"
+  end
+
+  def self.sync_user(user_id)
+    user = User.find(user_id)
+    if user.trello_client
+      # sync boards
+      user.trello_open_boards.each do |board|
+        TrelloProject.update_or_create(board, user)
+      end
+
+      task_min_date = TrelloTask.joins(:project).where(projects: { user_id: user.id }).minimum(:last_synced_at)
+      task_min_date = TrelloProject.where(user_id: user.id ).minimum(:last_synced_at) if !task_min_date
+      user.trello_changed_cards(task_min_date).each do |changed_card|
+        project_info = TrelloProjectInfo.find_by(board_id: changed_card.board_id)
+        if project_info
+          TrelloTask.sync_task(changed_card, project_info.project)
+        end
+      end
+    end
   end
 
   def self.start

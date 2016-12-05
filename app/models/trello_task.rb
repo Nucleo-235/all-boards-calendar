@@ -15,6 +15,7 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  trello_list_id :string
+#  last_synced_at :datetime
 #
 
 class TrelloTask < Task
@@ -37,4 +38,51 @@ class TrelloTask < Task
     task.trello_card_id = card.id
     task.update_with_card(card)
   end
+
+  def self.sync_task(trello_card, project)
+    lastSync = Time.new
+    
+    # puts trello_card.inspect
+    # logger.debug trello_card
+
+    if trello_card.member_ids.include? member_id
+      task = project.tasks.find_by(type: TrelloTask.name, trello_card_id: trello_card.id)
+      if task
+        task.update_with_card(trello_card)
+      else
+        task = TrelloTask.create_with_card(project, trello_card)
+      end
+
+      labels = []
+      trello_card.labels.each do |trello_label|
+        labels.push Label.find_or_create_by(name: trello_label.name)
+      end
+
+      existing_labels = task.task_labels.map { |e| e.label.name }
+      labels.each do |label|
+        created_label = task.task_labels.find_or_create_by(label: label)
+        existing_labels.delete(label.name) if existing_labels.include? label.name
+      end
+
+      # remove labels que nao foram mais encontradas
+      existing_labels.each do |not_found_label_name|
+        task.task_labels.where(label: Label.find_by(name: not_found_label_name)).destroy_all
+      end
+      task.update_last_sync(lastSync)
+    else
+      task = project.tasks.find_by(type: TrelloTask.name, trello_card_id: trello_card.id)
+      if task
+        task.update_with_card(trello_card) 
+        task.update_last_sync(lastSync)
+      end
+    end
+
+    task
+  end
+
+  private
+    def update_last_sync(lastSync)
+      task.last_synced_at = lastSync
+      task.save
+    end
 end

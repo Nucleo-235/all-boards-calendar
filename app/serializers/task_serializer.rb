@@ -15,6 +15,7 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  trello_list_id :string
+#  last_synced_at :datetime
 #
 
 class TaskSerializer < ActiveModel::Serializer

@@ -31,6 +31,7 @@
 #
 
 require 'trello'
+require 'trello_utils'
 require 'file_size_validator'
 
 class User < ActiveRecord::Base
@@ -116,5 +117,15 @@ class User < ActiveRecord::Base
 
   def trello_cards(params = {})
     return Trello::Card.from_response trello_client.get("/members/me/cards", params)
+  end
+
+  def trello_actions(params = {})
+    return Trello::Card.from_response trello_client.get("/members/me/actions", params)
+  end
+
+  def trello_changed_cards(last_synced_at)
+    params = { filter: (TrelloUtils.cards_update_actions + TrelloUtils.cards_delete_actions).join(',') }
+    params[:since] = last_synced_at.to_s if last_synced_at
+    actions = Trello::Action.from_response trello_client.get("/members/me/actions", params)
   end
 end
