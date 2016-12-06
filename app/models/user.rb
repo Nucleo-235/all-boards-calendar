@@ -117,7 +117,11 @@ class User < ActiveRecord::Base
   end
 
   def trello_cards(params = {})
-    return Trello::Card.from_response trello_client.get("/members/me/cards", params)
+    begin
+      return Trello::Card.from_response trello_client.get("/members/me/cards", params)
+    rescue RestClient::RequestTimeout => timeoutError
+      return Trello::Card.from_response trello_client.get("/members/me/cards", params)
+    end
   end
 
   def trello_actions(params = {})

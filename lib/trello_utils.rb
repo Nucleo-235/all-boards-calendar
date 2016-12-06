@@ -64,7 +64,11 @@ class TrelloUtils
           deleted_card.type = :deleted_card
           deleted_card
         else
-          Trello::Card.from_response client.get("/cards/#{card_id}")
+          begin
+            Trello::Card.from_response client.get("/cards/#{card_id}")
+          rescue RestClient::RequestTimeout => timeoutError
+            Trello::Card.from_response client.get("/cards/#{card_id}")
+          end
         end
       rescue
         puts action.to_json
