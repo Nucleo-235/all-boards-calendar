@@ -25,7 +25,7 @@ class TrelloTask < Task
     self.name = card.name
     self.description = card.desc
     self.due_date = card.due
-    self.completed = card.closed || (card.badges && card.badges.dueComplete)
+    self.completed = card.closed || (card.badges && card.badges["dueComplete"])
     self.assigned = card.member_ids.length > 0
     self.trello_list_id = card.list_id
     self.save!
