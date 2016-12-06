@@ -28,6 +28,7 @@
 #  tokens                 :json
 #  created_at             :datetime
 #  updated_at             :datetime
+#  last_synced_at         :datetime
 #
 
 class OrganizedPerson < User

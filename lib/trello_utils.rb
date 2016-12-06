@@ -52,10 +52,23 @@ class TrelloUtils
     @@updated_board_actions_to_s
   end
 
-  def self.get_cards_from_actions(actions)
+  def self.get_cards_from_actions(actions, client)
     cards = actions.map do |action|
       card_id = action.data["card"]["id"]
-      Trello::Card.from_response user.trello_client.get("/cards/#{card_id}")
+      begin
+        if action.type == 'deleteCard'
+          deleted_card = OpenStruct.new(action.data["card"])
+          deleted_card.list_id = action.data["board"]["id"] if action.data["list"].present?
+          deleted_card.board_id = action.data["board"]["id"]
+          deleted_card.type = :deleted_card
+          deleted_card
+        else
+          Trello::Card.from_response client.get("/cards/#{card_id}")
+        end
+      rescue
+        puts action.to_json
+        raise
+      end
     end
     cards
   end

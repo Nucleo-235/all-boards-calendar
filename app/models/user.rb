@@ -28,6 +28,7 @@
 #  tokens                 :json
 #  created_at             :datetime
 #  updated_at             :datetime
+#  last_synced_at         :datetime
 #
 
 require 'trello'
@@ -120,12 +121,14 @@ class User < ActiveRecord::Base
   end
 
   def trello_actions(params = {})
-    return Trello::Card.from_response trello_client.get("/members/me/actions", params)
+    return Trello::Action.from_response trello_client.get("/members/me/actions", params)
   end
 
-  def trello_changed_cards(last_synced_at)
+  def trello_changed_cards(last_synced_at, before_date)
     params = { filter: (TrelloUtils.cards_update_actions + TrelloUtils.cards_delete_actions).join(',') }
     params[:since] = last_synced_at.to_s if last_synced_at
-    actions = Trello::Action.from_response trello_client.get("/members/me/actions", params)
+    params[:before] = before_date.to_s if before_date
+    actions = trello_actions(params)
+    TrelloUtils.get_cards_from_actions(actions, self.trello_client)
   end
 end

@@ -23,18 +23,29 @@ class ProjectSyncer
   def self.sync_user(user_id)
     user = User.find(user_id)
     if user.trello_client
+      # synca mudanças
+      if user.last_synced_at
+        newSyncDate = Time.new
+        member_id = user.trello_member.id
+        user.trello_changed_cards(user.last_synced_at, newSyncDate).each do |changed_card|
+          begin
+            project_info = TrelloProjectInfo.find_by(board_id: changed_card.board_id)
+            if project_info
+              TrelloTask.sync_task(changed_card, project_info.project, member_id)
+            end
+          rescue
+            puts changed_card.to_json
+            raise
+          end
+        end
+
+        user.user.last_synced_at = newSyncDate
+        user.save!
+      end
+
       # sync boards
       user.trello_open_boards.each do |board|
         TrelloProject.update_or_create(board, user)
-      end
-
-      task_min_date = TrelloTask.joins(:project).where(projects: { user_id: user.id }).minimum(:last_synced_at)
-      task_min_date = TrelloProject.where(user_id: user.id ).minimum(:last_synced_at) if !task_min_date
-      user.trello_changed_cards(task_min_date).each do |changed_card|
-        project_info = TrelloProjectInfo.find_by(board_id: changed_card.board_id)
-        if project_info
-          TrelloTask.sync_task(changed_card, project_info.project)
-        end
       end
     end
   end

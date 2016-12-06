@@ -2,21 +2,20 @@
 #
 # Table name: projects
 #
-#  id                   :integer          not null, primary key
-#  type                 :string
-#  name                 :string           not null
-#  slug                 :string
-#  user_id              :integer
-#  description          :text
-#  documentation_url    :string
-#  code_url             :string
-#  assets_url           :string
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  public               :boolean          default(TRUE)
-#  last_synced_at       :datetime
-#  closed               :boolean          default(FALSE)
-#  last_synced_tasks_at :datetime
+#  id                :integer          not null, primary key
+#  type              :string
+#  name              :string           not null
+#  slug              :string
+#  user_id           :integer
+#  description       :text
+#  documentation_url :string
+#  code_url          :string
+#  assets_url        :string
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  public            :boolean          default(TRUE)
+#  last_synced_at    :datetime
+#  closed            :boolean          default(FALSE)
 #
 
 require 'trello_utils'
@@ -32,12 +31,12 @@ class TrelloProject < Project
 
   def get_updated_cards
     actions = Trello::Action.from_response user.trello_client.get("/boards/#{info.board_id}/actions", { filter: TrelloUtils.cards_update_actions_to_s, since: self.last_synced_at.to_s })
-    TrelloUtils.get_cards_from_actions(actions)
+    TrelloUtils.get_cards_from_actions(actions, user.trello_client)
   end
 
   def get_deleted_cards
     actions = Trello::Action.from_response user.trello_client.get("/boards/#{info.board_id}/actions", { filter: TrelloUtils.cards_delete_actions_to_s, since: self.last_synced_at.to_s })
-    TrelloUtils.get_cards_from_actions(actions)
+    TrelloUtils.get_cards_from_actions(actions, user.trello_client)
   end
 
   def get_new_cards
@@ -57,7 +56,7 @@ class TrelloProject < Project
 
   def sync_tasks(trello_cards = nil)
     if !trello_cards
-      if self.last_synced_tasks_at
+      if self.last_synced_at
         trello_cards = get_updated_cards + get_deleted_cards
       else
         trello_cards = get_new_cards
@@ -69,7 +68,7 @@ class TrelloProject < Project
     member_id = user.trello_member.id
     
     trello_cards.each do |trello_card|
-      task = TrelloTask.sync_task(trello_card, user, board)
+      task = TrelloTask.sync_task(trello_card, self, member_id)
       existing_tasks.delete(task.id) if (task && existing_tasks.include?(task.id))
     end
   end
