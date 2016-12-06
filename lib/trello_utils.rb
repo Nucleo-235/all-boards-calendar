@@ -58,7 +58,7 @@ class TrelloUtils
       begin
         if action.type == 'deleteCard'
           deleted_card = OpenStruct.new(action.data["card"])
-          deleted_card.list_id = action.data["board"]["id"] if action.data["list"].present?
+          deleted_card.list_id = action.data["list"]["id"] if action.data["list"].present?
           deleted_card.board_id = action.data["board"]["id"]
           deleted_card.type = :deleted_card
           deleted_card
