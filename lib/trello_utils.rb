@@ -7,6 +7,7 @@ class TrelloUtils
       "copyCard",
       "createCard",
       "moveCardToBoard",
+      "updateCard",
       "updateCard:closed",
       "updateList:closed"
     ]
