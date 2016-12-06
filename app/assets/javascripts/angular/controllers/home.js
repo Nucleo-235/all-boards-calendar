@@ -46,7 +46,10 @@ angular.module('MyApp')
     }
 
     function taskToEvent(task) {
-      return { id: task.id, title: task.name, description: task.description, start: moment(task.due_date).toDate(), allDay: true }
+      var event = { id: task.id, title: task.name, description: task.description, start: moment(task.due_date).toDate(), allDay: true };
+      if (task.completed)
+        event.color = 'green';
+      return event;
     }
 
     function fillTasks(startDate, endDate) {
