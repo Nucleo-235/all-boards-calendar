@@ -24,8 +24,9 @@ class ProjectSyncer
     user = User.find(user_id)
     if user.trello_client
       # synca mudanças
+      newSyncDate = Time.new
+
       if user.last_synced_at && user.projects.where.not(last_synced_at: nil).length > 0
-        newSyncDate = Time.new
         member_id = user.trello_member.id
         user.trello_changed_cards(user.last_synced_at, newSyncDate).each do |changed_card|
           begin
@@ -39,13 +40,18 @@ class ProjectSyncer
           end
         end
 
-        user.user.last_synced_at = newSyncDate
+        user.last_synced_at = newSyncDate
         user.save!
       end
 
       # sync boards
       user.trello_open_boards.each do |board|
         TrelloProject.update_or_create(board, user)
+      end
+
+      if !user.last_synced_at
+        user.last_synced_at = newSyncDate
+        user.save!
       end
     end
   end
