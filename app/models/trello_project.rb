@@ -56,7 +56,7 @@ class TrelloProject < Project
 
   def sync_tasks(trello_cards = nil)
     if !trello_cards
-      if self.last_synced_at
+      if self.last_synced_at && self.tasks.length > 0
         trello_cards = get_updated_cards + get_deleted_cards
       else
         trello_cards = get_new_cards
