@@ -7,6 +7,7 @@ class TasksController < ApplicationController
   def index
     @tasks = Task.joins(:project).where(projects: { user_id: current_user.id })
     @tasks = @tasks.where(due_date: (params[:startDate]..params[:endDate]))
+    @tasks = @tasks.order(:due_date)
 
     render json: @tasks
   end
