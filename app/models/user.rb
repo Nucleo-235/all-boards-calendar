@@ -43,6 +43,7 @@ class User < ActiveRecord::Base
           :confirmable, :omniauthable
   
   has_many :identities, dependent: :destroy
+  has_many :projects, dependent: :destroy
 
   def masked_email
     if email && email.length > 5
