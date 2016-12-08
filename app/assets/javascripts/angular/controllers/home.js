@@ -1,5 +1,5 @@
 angular.module('MyApp')
-  .controller('HomeCtrl', function($scope, $rootScope, $state, $auth, $q, Task, $uibModal) {
+  .controller('HomeCtrl', function($scope, $rootScope, $state, $auth, $q, Task, $uibModal, $interval) {
     $scope.viewChanged = function( view, element ) {
       var newStart = moment(view.intervalStart.toISOString()).local().toDate();
       var newEnd = moment(view.intervalEnd.toISOString()).local().toDate();
@@ -31,6 +31,9 @@ angular.module('MyApp')
     function successLogged(data) {
       console.log('logged');
       reloadTasks();
+      $interval(function() {
+        reloadTasks();
+      }, 10 * 60 * 1000);
     };
 
     $scope.loginWithTrello = function() {
