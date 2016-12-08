@@ -1,9 +1,7 @@
 angular.module('MyApp')
-  .controller('HomeCtrl', ['$scope', '$rootScope', '$state', '$auth', '$q', 'Task', '$uibModal', '$interval', function($scope, $rootScope, $state, $auth, $q, Task, $uibModal, $interval) {
+  .controller('HomeCtrl', ['$scope', '$rootScope', '$state', '$auth', '$q', 'Task', '$uibModal', '$interval', 'uiCalendarConfig', function($scope, $rootScope, $state, $auth, $q, Task, $uibModal, $interval, uiCalendarConfig) {
     $scope.viewChanged = function( view, element ) {
-      var newStart = moment(view.intervalStart.toISOString()).local().toDate();
-      var newEnd = moment(view.intervalEnd.toISOString()).local().toDate();
-      fillTasks(newStart, newEnd);
+      reloadTasks(view);
     };
 
     /* config object */
@@ -29,12 +27,21 @@ angular.module('MyApp')
     
     $scope.eventsSource = [];
 
+    var intervalStarted = false;
+    function startInterval() {
+      if (!intervalStarted) {
+        intervalStarted = true;
+        console.log('interval started');
+        $interval(function() {
+          console.log('interval reached');
+          reloadTasks();
+        }, 10 * 60 * 1000);
+      }
+    };
+
     function successLogged(data) {
-      console.log('logged');
+      startInterval();
       reloadTasks();
-      $interval(function() {
-        reloadTasks();
-      }, 10 * 60 * 1000);
     };
 
     $scope.loginWithTrello = function() {
@@ -56,14 +63,14 @@ angular.module('MyApp')
         // setTimeout(logOrRegisterWithUUID, 100);
         return result;
       });
-    }
+    };
 
     function taskToEvent(task) {
       var event = { id: task.id, title: task.project_name + '\r\n' + task.name, description: task.description, start: moment(task.due_date).toDate(), allDay: true, url: task.external_url };
       if (task.completed)
         event.color = 'green';
       return event;
-    }
+    };
 
     function fillTasks(startDate, endDate) {
       Task.query({startDate: startDate, endDate: endDate}).then(function(data) {
@@ -76,19 +83,22 @@ angular.module('MyApp')
         $scope.eventsSource.push(events);
         $scope.events = events;
       });
-    }
+    };
 
-    function reloadTasks() {
-      var startDate = moment(new Date()).startOf('month').toDate();
-      var endDateMoment = moment(startDate); // moment(...) can also be used to parse dates in string format
-      endDateMoment.add(1, 'months');
-      endDate = endDateMoment.toDate();
+    function reloadTasks(view) {
+      console.log('reloadTasks reached');
 
-      fillTasks(startDate, endDate);
+      if (!view)
+        view = uiCalendarConfig.calendars.tasksCalendar.fullCalendar('getView');
+      var newStart = moment(view.intervalStart.toISOString()).local().toDate();
+      var newEnd = moment(view.intervalEnd.toISOString()).local().toDate();
+      fillTasks(newStart, newEnd);
     }
     
     if ($scope.isAuthenticated()) {
       successLogged($rootScope.user);
+    } else {
+      startInterval();
     }
 
     $scope.refreshTasks = function() {
