@@ -87,7 +87,9 @@ angular.module('MyApp')
       fillTasks(startDate, endDate);
     }
     
-    reloadTasks();
+    if ($scope.isAuthenticated()) {
+      successLogged($rootScope.user);
+    }
 
     $scope.refreshTasks = function() {
       reloadTasks();
