@@ -5,7 +5,7 @@ angular.module('MyApp', ['ngResource', 'ngMessages', 'ngAnimate', 'templates', '
       ROOT_ROUTE: '/home',
       ROOT_STATE: 'home'
   })
-  .config(function($stateProvider, $urlRouterProvider, $authProvider, config) {
+  .config(["$stateProvider", "$urlRouterProvider", "$authProvider", "config", function($stateProvider, $urlRouterProvider, $authProvider, config) {
     $stateProvider
       .state('home', {
         url: '/home',
@@ -115,10 +115,10 @@ angular.module('MyApp', ['ngResource', 'ngMessages', 'ngAnimate', 'templates', '
       }
       return deferred.promise;
     }
-  });
+  }]);
 
 angular.module('MyApp')
-  .run(function($rootScope, $location, config) {
+  .run(["$rootScope", "$location", "config", function($rootScope, $location, config) {
     $rootScope.datepickerPopupOptions = {
       showButtonBar: false,
       showWeeks: false,
@@ -128,11 +128,11 @@ angular.module('MyApp')
     $rootScope.goToRoot = function() {
       $location.path(config.ROOT_ROUTE);
     };
-});
+}]);
 
 
 angular.module('MyApp')
-  .config(function (LightboxProvider, config) {
+  .config(["LightboxProvider", "config", function (LightboxProvider, config) {
     LightboxProvider.templateUrl = 'image-modal.html';
 
     LightboxProvider.getFileUrl = function(url) {
@@ -145,7 +145,7 @@ angular.module('MyApp')
     LightboxProvider.getImageUrl = function (image) {
       return image.hasOwnProperty('uploaded') ? (image.uploaded['$ngfDataUrl'] || LightboxProvider.getFileUrl(image.file.url)) : LightboxProvider.getFileUrl(image.file.url);
     };
-});
+}]);
 
 angular.module('MyApp').constant("ROUTE_PREFIX", "manage");
 
