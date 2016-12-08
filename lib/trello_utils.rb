@@ -55,8 +55,8 @@ class TrelloUtils
 
   def self.get_cards_from_actions(actions, client)
     cards = actions.map do |action|
-      card_id = action.data["card"]["id"]
       begin
+        card_id = action.data["card"]["id"]
         if action.type == 'deleteCard'
           deleted_card = OpenStruct.new(action.data["card"])
           deleted_card.list_id = action.data["list"]["id"] if action.data["list"].present?
