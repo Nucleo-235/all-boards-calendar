@@ -1,5 +1,5 @@
 angular.module('MyApp')
-  .controller('HomeCtrl', function($scope, $rootScope, $state, $auth, $q, Task, $uibModal, $interval) {
+  .controller('HomeCtrl', ['$scope', '$rootScope', '$state', '$auth', '$q', 'Task', '$uibModal', '$interval', function($scope, $rootScope, $state, $auth, $q, Task, $uibModal, $interval) {
     $scope.viewChanged = function( view, element ) {
       var newStart = moment(view.intervalStart.toISOString()).local().toDate();
       var newEnd = moment(view.intervalEnd.toISOString()).local().toDate();
@@ -113,4 +113,4 @@ angular.module('MyApp')
     //   document.addEventListener("deviceready", validate, false);
     // else
     //   validate();
-  });
+  }]);

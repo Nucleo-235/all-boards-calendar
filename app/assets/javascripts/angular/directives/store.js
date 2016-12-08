@@ -9,7 +9,7 @@
 // }
 
 angular.module('MyApp')
-  .factory("$store",function($parse){
+  .factory("$store",['$parse', function($parse){
     /**
      * Global Vars
      */
@@ -117,4 +117,4 @@ angular.module('MyApp')
             }
     };
     return publicMethods;
-  });
+  }]);
