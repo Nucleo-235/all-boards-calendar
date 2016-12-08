@@ -8,8 +8,7 @@ class TrelloUtils
       "createCard",
       "moveCardToBoard",
       "updateCard",
-      "updateCard:closed",
-      "updateList:closed"
+      "updateCard:closed"
     ]
     @@trello_cards_update_actions
   end
@@ -24,8 +23,7 @@ class TrelloUtils
       "deleteCard",
       "moveCardFromBoard",
       "removeMemberFromCard",
-      "updateCard:closed",
-      "updateList:closed"
+      "updateCard:closed"
     ]
     @@trello_cards_delete_actions
   end
