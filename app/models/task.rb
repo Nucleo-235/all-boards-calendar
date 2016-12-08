@@ -16,6 +16,7 @@
 #  updated_at     :datetime         not null
 #  trello_list_id :string
 #  last_synced_at :datetime
+#  external_url   :string
 #
 
 class Task < ActiveRecord::Base

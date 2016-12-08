@@ -14,6 +14,15 @@ angular.module('MyApp')
           left: 'month basicWeek basicDay',
           center: 'title',
           right: 'today prev,next'
+        },
+        eventClick: function(event) {
+        // opens events in a popup window
+          window.open(event.url);
+          return false;
+        },
+        
+        loading: function(bool) {
+          $('#loading').toggle(bool);
         }
       }
     };
@@ -46,7 +55,7 @@ angular.module('MyApp')
     }
 
     function taskToEvent(task) {
-      var event = { id: task.id, title: task.name, description: task.description, start: moment(task.due_date).toDate(), allDay: true };
+      var event = { id: task.id, title: task.project_name + '\r\n' + task.name, description: task.description, start: moment(task.due_date).toDate(), allDay: true, url: task.external_url };
       if (task.completed)
         event.color = 'green';
       return event;

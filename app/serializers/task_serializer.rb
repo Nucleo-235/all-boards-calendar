@@ -16,10 +16,11 @@
 #  updated_at     :datetime         not null
 #  trello_list_id :string
 #  last_synced_at :datetime
+#  external_url   :string
 #
 
 class TaskSerializer < ActiveModel::Serializer
-  attributes :id, :type, :name, :description, :due_date, :completed, :assigned, :project_name
+  attributes :id, :type, :name, :description, :due_date, :completed, :assigned, :project_name, :external_url
 
   has_many :labels
 

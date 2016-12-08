@@ -12,6 +12,7 @@ gem 'active_model_serializers', "0.10.0.rc4"
 gem 'http_accept_language'
 gem 'globalize', '~> 5.0.0'
 gem 'friendly_id', '~> 5.1.0'
+gem "paranoia", "~> 2.2"
 
 # workers
 gem 'sinatra'

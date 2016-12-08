@@ -47,11 +47,22 @@ class TrelloProject < Project
   def sync_project_only(trello_board = nil)
     lastSync = Time.new
 
-    trello_board = Trello::Board.from_response user.trello_client.get("/boards/#{info.board_id}") if !trello_board || trello_board.id != info.board_id
-    self.closed = trello_board.closed
-    self.public = trello_board.prefs["permissionLevel"] && trello_board.prefs["permissionLevel"] == "public"
-    self.last_synced_at = lastSync
-    self.save
+    begin
+      trello_board = Trello::Board.from_response user.trello_client.get("/boards/#{info.board_id}") if !trello_board || trello_board.id != info.board_id
+      self.closed = trello_board.closed
+      self.public = trello_board.prefs["permissionLevel"] && trello_board.prefs["permissionLevel"] == "public"
+      self.last_synced_at = lastSync
+      self.save
+    rescue Trello::Error => ex
+      # caso tenha sido removido
+      if ex.message == "unauthorized permission requested"
+        self.destroy
+      else
+        puts "Board " + self.name
+        puts ex.inspect
+        raise
+      end
+    end
   end
 
   def sync_tasks(trello_cards = nil)

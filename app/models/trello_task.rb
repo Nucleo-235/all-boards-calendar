@@ -16,6 +16,7 @@
 #  updated_at     :datetime         not null
 #  trello_list_id :string
 #  last_synced_at :datetime
+#  external_url   :string
 #
 
 class TrelloTask < Task
@@ -28,6 +29,7 @@ class TrelloTask < Task
     self.completed = card.closed || (card.badges && card.badges["dueComplete"])
     self.assigned = card.member_ids.length > 0
     self.trello_list_id = card.list_id
+    self.external_url = card.url
     self.save!
     self
   end

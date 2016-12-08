@@ -27,8 +27,8 @@ class Project < ActiveRecord::Base
   belongs_to :user
   validates_presence_of :name
 
-  has_many :tasks
-  has_many :members, class_name: :ProjectMember, foreign_key: 'project_id'
+  has_many :tasks, dependent: :destroy
+  has_many :members, dependent: :destroy, class_name: :ProjectMember, foreign_key: 'project_id'
 
   scope :valid , -> do
     where(closed: false)
