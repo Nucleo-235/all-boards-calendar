@@ -41,6 +41,18 @@ class TrelloTask < Task
     task.update_with_card(card)
   end
 
+  def self.is_valid?(trello_card, project, trello_member_id)
+    if trello_card.member_ids.include? trello_member_id
+      if !project.user.user_preference || ((trello_card.labels.map { |l| l.name  }) & project.user.user_preference.excluded_labels_list).empty?
+        return true
+      else
+        return false
+      end
+    else
+      return false
+    end
+  end
+
   def self.sync_task(trello_card, project, trello_member_id)
     lastSync = Time.new
     
@@ -48,7 +60,7 @@ class TrelloTask < Task
     # logger.debug trello_card
 
     if trello_card.class.name == Trello::Card.name
-     if trello_card.member_ids.include? trello_member_id
+      if TrelloTask.is_valid?(trello_card, project, trello_member_id)
         task = project.tasks.find_by(type: TrelloTask.name, trello_card_id: trello_card.id)
         if task
           task.update_with_card(trello_card)
