@@ -13,7 +13,7 @@ Rails.application.routes.draw do
     scope :v1 do
       get 'me', to: 'users#me'
 
-      resources :tasks, only: [:index]
+      resources :tasks, only: [:index, :show, :update]
 
       resources :users do 
         get 'update_image', on: :collection

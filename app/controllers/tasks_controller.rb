@@ -1,5 +1,5 @@
-class TasksController < ApplicationController
-  skip_before_action :authenticate_user!, only: [:index]
+class TasksController < ApiController
+  # skip_before_action :authenticate_user!, only: [:index]
   before_action :set_task, only: [:show, :update, :destroy]
 
   # GET /tasks
@@ -34,8 +34,9 @@ class TasksController < ApplicationController
   # PATCH/PUT /tasks/1.json
   def update
     @task = Task.find(params[:id])
-
-    if @task.update(task_params)
+    if @task.project.user.id != current_user.id
+      head :forbidden
+    elsif @task.update(task_params)
       head :no_content
     else
       render json: @task.errors, status: :unprocessable_entity

@@ -22,15 +22,22 @@
 class TrelloTask < Task
   validates_presence_of :trello_card_id
 
+  before_update :check_to_update_card
+
   def update_with_card(card)
-    self.name = card.name
-    self.description = card.desc
-    self.due_date = card.due
-    self.completed = card.closed || (card.badges && card.badges["dueComplete"])
-    self.assigned = card.member_ids.length > 0
-    self.trello_list_id = card.list_id
-    self.external_url = card.url
-    self.save!
+    begin
+      @trello_card = card
+      self.name = card.name
+      self.description = card.desc
+      self.due_date = card.due
+      self.completed = card.closed || (card.badges && card.badges["dueComplete"])
+      self.assigned = card.member_ids.length > 0
+      self.trello_list_id = card.list_id
+      self.external_url = card.url
+      self.save!
+    ensure
+      @trello_card = nil
+    end
     self
   end
 
@@ -98,8 +105,27 @@ class TrelloTask < Task
 
     task
   end
+  
+  def check_to_update_card
+    if !@trello_card
+      begin
+        @trello_card = Trello::Card.from_response project.user.trello_client.get("/cards/#{trello_card_id}")
+        
+        if @trello_card
+          if @trello_card.due != self.due_date
+            @trello_card.due = self.due_date
+            @trello_card.client = project.user.trello_client
+            @trello_card.save
+          end
+        end
+      ensure
+        @trello_card = nil
+      end
+    end
+  end
 
   private
+
     def self.update_last_sync(task, lastSync)
       task.last_synced_at = lastSync
       task.save

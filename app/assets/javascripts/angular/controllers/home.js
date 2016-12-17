@@ -13,12 +13,26 @@ angular.module('MyApp')
           center: 'title',
           right: 'today prev,next'
         },
+        editable: true,
         eventClick: function(event) {
         // opens events in a popup window
           window.open(event.url);
           return false;
         },
-        
+        eventDrop: function(event, delta, revertFunc, jsEvent, ui, view) {
+          console.log(event);
+          console.log(delta);
+          Task.get(event.id).then(function (task) {
+            var due_moment = moment(moment(task.due_date) + delta);
+            task.due_date = due_moment.toDate();
+            console.log(task);
+            task.save().then(function(data) {
+
+            }, function(error) { 
+              revertFunc();
+            }) 
+          });
+        },
         loading: function(bool) {
           $('#loading').toggle(bool);
         }
