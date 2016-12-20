@@ -9,7 +9,7 @@ angular.module('MyApp')
       calendar:{
         viewRender: $scope.viewChanged,
         header:{
-          left: 'month basicWeek basicDay',
+          left: 'month agendaWeek agendaDay',
           center: 'title',
           right: 'today prev,next'
         },
@@ -32,6 +32,23 @@ angular.module('MyApp')
               revertFunc();
             }) 
           });
+        },
+        eventMouseover: function(calEvent, jsEvent) {
+          var tooltip = '<div class="tooltipevent" style="width:100px;height:100px;background:#ccc;position:absolute;z-index:10001;">' + calEvent.title + '</div>';
+          var $tooltip = $(tooltip).appendTo('body');
+
+          $(this).mouseover(function(e) {
+            $(this).css('z-index', 10000);
+            $tooltip.fadeIn('500');
+            $tooltip.fadeTo('10', 1.9);
+          }).mousemove(function(e) {
+            $tooltip.css('top', e.pageY + 10);
+            $tooltip.css('left', e.pageX + 20);
+          });
+        },
+        eventMouseout: function(calEvent, jsEvent) {
+            $(this).css('z-index', 8);
+            $('.tooltipevent').remove();
         },
         loading: function(bool) {
           $('#loading').toggle(bool);
@@ -78,11 +95,54 @@ angular.module('MyApp')
         return result;
       });
     };
-
+    
     function taskToEvent(task) {
-      var event = { id: task.id, title: task.project_name + '\r\n' + task.name, description: task.description, start: moment(task.due_date).toDate(), allDay: true, url: task.external_url };
+      var due_moment = moment(task.due_date);
+      var allDay = false;
+      var startDate = moment(due_moment).toDate();
+      var endDate = moment(due_moment).add(1, 'h').toDate();
+      // console.log(startDate);
+      // console.log(endDate);
+
+      var event = { id: task.id, title: task.project_name + '\r\n' + task.name, description: task.description, url: task.external_url };
       if (task.completed)
         event.color = 'green';
+
+      var periodRegexp1 = /\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/g;
+      var periodRegexp2 = /\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/g;
+      var match = periodRegexp1.exec(task.name);
+      if (!match || match == null)
+        match = periodRegexp2.exec(task.name);
+
+      if (match && (match.length == 4 || match.length == 3)) {
+        var delta = parseFloat(match[1]);
+        if (isNaN(delta))
+          delta = 1;
+
+        var deltaType = 'h';
+        var newName = task.name;
+        if (match.length == 4) {
+          deltaType = match[2];
+          if (!deltaType || deltaType.length == 0)
+            deltaType = 'h';  
+          newName = match[3];
+        } else {
+          newName = match[2];
+        }
+
+        event.title = task.project_name + '\r\n' + newName;
+        if (delta > 0) {
+          endDate = moment(due_moment).add(delta, deltaType).toDate();
+        } else {
+          startDate = moment(due_moment).add(delta, deltaType).toDate();
+          endDate = moment(due_moment).toDate();  
+        }
+      }
+
+      event.start = startDate;
+      event.end = endDate;
+      event.allDay = moment(event.end).diff(moment(event.start), 'days', true) >= 1;
+
       return event;
     };
 
