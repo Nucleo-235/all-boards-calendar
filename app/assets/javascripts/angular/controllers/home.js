@@ -34,7 +34,7 @@ angular.module('MyApp')
           });
         },
         eventMouseover: function(calEvent, jsEvent) {
-          var tooltip = '<div class="tooltipevent" style="width:100px;height:100px;background:#ccc;position:absolute;z-index:10001;">' + calEvent.title + '</div>';
+          var tooltip = '<div class="tooltipevent" style="min-width:200px;width:auto;max-width:60%;height:100px;background:#ccc;position:absolute;z-index:10001;">' + calEvent.title + '</div>';
           var $tooltip = $(tooltip).appendTo('body');
 
           $(this).mouseover(function(e) {
