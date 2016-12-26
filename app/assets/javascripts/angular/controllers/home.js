@@ -130,12 +130,15 @@ angular.module('MyApp')
           delta = 1;
 
         var deltaType = 'h';
+        if (match.length == 4) {
+          deltaType = match[2];
+          if (!deltaType || deltaType.length == 0)
+            deltaType = 'h';  
+        }
+        
         var newName = task.name;
         if (currentRegex.property == "name") {
           if (match.length == 4) {
-            deltaType = match[2];
-            if (!deltaType || deltaType.length == 0)
-              deltaType = 'h';  
             newName = match[3];
           } else {
             newName = match[2];
