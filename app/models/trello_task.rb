@@ -93,10 +93,11 @@ class TrelloTask < Task
         TrelloTask.update_last_sync(task, lastSync)
       else
         task = project.tasks.find_by(type: TrelloTask.name, trello_card_id: trello_card.id)
-        if task
-          task.update_with_card(trello_card) 
-          TrelloTask.update_last_sync(task, lastSync)
-        end
+        task.destroy if task
+        # if task
+        #   task.update_with_card(trello_card) 
+        #   TrelloTask.update_last_sync(task, lastSync)
+        # end
       end
     else
       task = project.tasks.find_by(type: TrelloTask.name, trello_card_id: trello_card.id)
