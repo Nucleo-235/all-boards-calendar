@@ -116,8 +116,9 @@ angular.module('MyApp')
       ];
 
       var match = null;
+      var currentRegex = null;
       while (regexList.length > 0 && (!match || match == null)) {
-        var currentRegex = regexList[0];
+        currentRegex = regexList[0];
         regexList.splice(0, 1);
 
         match = currentRegex.regex.exec(task[currentRegex.property]);;
@@ -130,13 +131,15 @@ angular.module('MyApp')
 
         var deltaType = 'h';
         var newName = task.name;
-        if (match.length == 4) {
-          deltaType = match[2];
-          if (!deltaType || deltaType.length == 0)
-            deltaType = 'h';  
-          newName = match[3];
-        } else {
-          newName = match[2];
+        if (currentRegex.property == "name") {
+          if (match.length == 4) {
+            deltaType = match[2];
+            if (!deltaType || deltaType.length == 0)
+              deltaType = 'h';  
+            newName = match[3];
+          } else {
+            newName = match[2];
+          }
         }
 
         event.title = task.project_name + '\r\n' + newName;
