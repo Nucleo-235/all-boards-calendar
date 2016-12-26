@@ -44,6 +44,7 @@ class User < ActiveRecord::Base
   
   has_many :identities, dependent: :destroy
   has_many :projects, dependent: :destroy
+  has_many :tasks, through: :projects
   
   has_one :user_preference, dependent: :destroy
 

@@ -25,9 +25,9 @@ class ProjectSyncer
     if user.trello_client
       # synca mudanças
       newSyncDate = Time.new
+      member_id = user.trello_member.id
 
       if user.last_synced_at || user.projects.where.not(last_synced_at: nil).length > 0
-        member_id = user.trello_member.id
         user.trello_changed_cards(user.last_synced_at, newSyncDate).each do |changed_card|
           begin
             project_info = TrelloProjectInfo.find_by(board_id: changed_card.board_id)
