@@ -111,8 +111,8 @@ angular.module('MyApp')
       var regexList = [
         { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/g },
         { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/g },
-        { property: "description", regex: /AllBoardCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/g },
-        { property: "description", regex: /AllBoardCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/g }
+        { property: "description", regex: /AllBoardsCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/g },
+        { property: "description", regex: /AllBoardsCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/g }
       ];
 
       var match = null;
