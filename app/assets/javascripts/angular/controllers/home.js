@@ -108,11 +108,20 @@ angular.module('MyApp')
       if (task.completed)
         event.color = 'green';
 
-      var periodRegexp1 = /\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/g;
-      var periodRegexp2 = /\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/g;
-      var match = periodRegexp1.exec(task.name);
-      if (!match || match == null)
-        match = periodRegexp2.exec(task.name);
+      var regexList = [
+        { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/g },
+        { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/g },
+        { property: "description", regex: /AllBoardCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/g },
+        { property: "description", regex: /AllBoardCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/g }
+      ];
+
+      var match = null;
+      while (regexList.length > 0 && (!match || match == null)) {
+        var currentRegex = regexList[0];
+        regexList.splice(0, 1);
+
+        match = currentRegex.regex.exec(task[currentRegex.property]);;
+      }
 
       if (match && (match.length == 4 || match.length == 3)) {
         var delta = parseFloat(match[1]);

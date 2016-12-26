@@ -105,11 +105,15 @@ class TrelloTask < Task
 
     task
   end
+
+  def trello_card
+    Trello::Card.from_response project.user.trello_client.get("/cards/#{trello_card_id}")
+  end
   
   def check_to_update_card
     if !@trello_card
       begin
-        @trello_card = Trello::Card.from_response project.user.trello_client.get("/cards/#{trello_card_id}")
+        @trello_card = self.trello_card
         
         if @trello_card
           if @trello_card.due != self.due_date
