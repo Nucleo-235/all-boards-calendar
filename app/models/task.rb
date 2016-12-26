@@ -24,5 +24,5 @@ class Task < ActiveRecord::Base
 
   validates_presence_of :project, :name
 
-  has_many :task_labels
+  has_many :task_labels, dependent: :destroy
 end
