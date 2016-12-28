@@ -13,6 +13,7 @@ angular.module('MyApp')
           center: 'title',
           right: 'today prev,next'
         },
+        nowIndicator:true,
         editable: true,
         eventClick: function(event) {
         // opens events in a popup window
