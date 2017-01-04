@@ -1,3 +1,8 @@
 .tasks
   h2 Tarefas
   div ui-calendar="uiConfig.calendar" ng-model="eventsSource" calendar="tasksCalendar"
+  div.filters
+    input type="text" ng-model="formData.searchTerm" ng-disabled="loadingEvents"
+    input type="button" value="Buscar" ng-click="refreshTasks()"
+  div.results
+    p ng-show="hoursSum" Horas: {{hoursSum}}

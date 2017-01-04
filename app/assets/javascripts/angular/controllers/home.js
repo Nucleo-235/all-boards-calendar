@@ -1,5 +1,6 @@
 angular.module('MyApp')
   .controller('HomeCtrl', ['$scope', '$rootScope', '$state', '$auth', '$q', 'Task', '$uibModal', '$interval', 'uiCalendarConfig', function($scope, $rootScope, $state, $auth, $q, Task, $uibModal, $interval, uiCalendarConfig) {
+    $scope.formData = { searchTerm: '' };
     $scope.viewChanged = function( view, element ) {
       reloadTasks(view);
     };
@@ -162,16 +163,41 @@ angular.module('MyApp')
       return event;
     };
 
+    function filterEvents(events,searchTerm) {
+      var filteredEvents = [];
+      for (var i = 0; i < events.length; i++) {
+        var event = events[i];
+        var matches = event.title.match(searchTerm);
+        if (matches)
+          filteredEvents.push(event);
+      }
+      return filteredEvents;
+    };
+
     function fillTasks(startDate, endDate) {
+      $scope.loadingEvents = true;
       Task.query({startDate: startDate, endDate: endDate}).then(function(data) {
         $scope.tasks = data;
         var events = $scope.tasks.map(function(item) {
           return taskToEvent(item);
         });
+        if ($scope.formData.searchTerm && $scope.formData.searchTerm.length > 0) {
+          events = filterEvents(events, $scope.formData.searchTerm);
+        }
+        var hoursSum = 0;
+        for (var i = 0; i < events.length; i++) {
+          var event = events[i];
+          if (!event.allDay) {
+            hoursSum += moment(event.end).diff(moment(event.start), 'hours');
+          }
+        }
+        $scope.hoursSum = hoursSum;
+
         if ($scope.eventsSource.length > 0)
           $scope.eventsSource.splice(0, 1)
         $scope.eventsSource.push(events);
         $scope.events = events;
+        $scope.loadingEvents = false;
       });
     };
 
