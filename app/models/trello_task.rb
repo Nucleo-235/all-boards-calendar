@@ -121,6 +121,8 @@ class TrelloTask < Task
             @trello_card.due = self.due_date
             @trello_card.client = project.user.trello_client
             @trello_card.save
+
+            TrelloTask.sync_task(@trello_card, self.project, self.project.user.trello_member.id)
           end
         end
       ensure
