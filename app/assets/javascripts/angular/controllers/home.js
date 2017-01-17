@@ -188,7 +188,7 @@ angular.module('MyApp')
         for (var i = 0; i < events.length; i++) {
           var event = events[i];
           if (!event.allDay) {
-            hoursSum += moment(event.end).diff(moment(event.start), 'hours');
+            hoursSum += moment(event.end).diff(moment(event.start), 'hours', true);
           }
         }
         $scope.hoursSum = hoursSum;
