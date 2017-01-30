@@ -206,11 +206,18 @@ angular.module('MyApp')
 
       if (!view)
         view = uiCalendarConfig.calendars.tasksCalendar.fullCalendar('getView');
-      var newStart = moment(view.intervalStart.toISOString()).local().toDate();
-      var newEnd = moment(view.intervalEnd.toISOString()).local().toDate();
+      var newStart = null;
+      var newEnd = null;
+      if (view.start && view.end) {
+        newStart = moment(view.start.toISOString()).local().toDate();
+        newEnd = moment(view.end.toISOString()).local().toDate();
+      } else {
+        newStart = moment(view.intervalStart.toISOString()).local().toDate();
+        newEnd = moment(view.intervalEnd.toISOString()).local().toDate();
+      }
       fillTasks(newStart, newEnd);
     }
-    
+
     if ($scope.isAuthenticated()) {
       successLogged($rootScope.user);
     } else {
