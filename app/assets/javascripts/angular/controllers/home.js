@@ -107,7 +107,7 @@ angular.module('MyApp')
         title: task.project_name + '\r\n' + task.name,
         start: task.start_date,
         end: task.end_date,
-        due_date: task.due_date
+        due_date: task.due_date,
         allDay: task.all_day,
         description: task.description,
         url: task.external_url };
