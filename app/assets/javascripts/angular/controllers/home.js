@@ -28,7 +28,7 @@ angular.module('MyApp')
             var start_moment = moment(moment(task.due_date) + delta);
             var due_moment = moment(moment(task.due_date) + delta);
             task.due_date = due_moment.toDate();
-            console.log(task);
+            // console.log(task);
             task.save().then(function(data) {
 
             }, function(error) { 
@@ -115,7 +115,7 @@ angular.module('MyApp')
       if (task.completed)
         event.color = 'green';
 
-      console.log(event);
+      // console.log(event);
 
       return event;
     };
@@ -145,7 +145,9 @@ angular.module('MyApp')
         for (var i = 0; i < events.length; i++) {
           var event = events[i];
           if (!event.allDay) {
-            hoursSum += moment(event.end).diff(moment(event.start), 'hours', true);
+            var hours = moment(event.end).diff(moment(event.start), 'hours', true);
+            if (!isNaN(hours))
+              hoursSum += hours;
           }
         }
         $scope.hoursSum = hoursSum;

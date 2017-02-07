@@ -32,10 +32,17 @@ class Task < ActiveRecord::Base
   has_many :task_labels, dependent: :destroy
 
   def to_ics
-    if self.start_date
+    if self.start_date && self.end_date
       event = Icalendar::Event.new
-      event.dtstart = Icalendar::Values::Date.new(self.start_date.strftime("%Y%m%dT%H%M%S"))
-      event.dtend = Icalendar::Values::Date.new(self.end_date.strftime("%Y%m%dT%H%M%S"))
+      # event.dtstart = Icalendar::Values::Date.new(self.start_date.strftime("%Y%m%dT%H%M%S"))
+      # event.dtend = Icalendar::Values::Date.new(self.end_date.strftime("%Y%m%dT%H%M%S"))
+      if self.all_day
+        event.dtstart = Icalendar::Values::Date.new(self.start_date.strftime("%Y%m%dT%H%M%S"))
+        event.dtend = Icalendar::Values::Date.new(self.end_date.strftime("%Y%m%dT%H%M%S"))
+      else
+        event.dtstart = Icalendar::Values::DateTime.new(self.start_date.strftime("%Y%m%dT%H%M%S"))
+        event.dtend = Icalendar::Values::DateTime.new(self.end_date.strftime("%Y%m%dT%H%M%S"))
+      end
       event.summary = self.name
       event.description = self.description
       event.location = self.project.name
@@ -112,15 +119,15 @@ class Task < ActiveRecord::Base
   def delta_to_time(delta, detalType)
     case detalType
       when 'h'
-        delta.hours
+        return delta.hours
       when 'm'
-        delta.minutes
+        return delta.minutes
       when 'd'
-        delta.days
+        return delta.days
       when 's'
-        delta.seconds
+        return delta.seconds
       else
-        delta.hours
+        return delta.hours
       end
   end
 end

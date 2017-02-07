@@ -6,4 +6,5 @@ div ng-include="'tasks/list.html'"
 .extra
   a ng-click="toggleICal()" href="" iCal
   .iCal ng-show="showiCal"
-    | {{ "#{Rails.application.routes.url_helpers.my_calendar_url({host: AllBoardsCalendar::Application.config.LINK_HOST_URL, uid: '_UID_', format: :ics})}".replace("_UID_", user.uid) }}
+    a href="{{ "#{Rails.application.routes.url_helpers.my_calendar_url({host: AllBoardsCalendar::Application.config.LINK_HOST_URL, uid: '_UID_', format: :ics})}".replace("_UID_", user.uid) }}" target="_blank"
+      | {{ "#{Rails.application.routes.url_helpers.my_calendar_url({host: AllBoardsCalendar::Application.config.LINK_HOST_URL, uid: '_UID_', format: :ics})}".replace("_UID_", user.uid) }}
