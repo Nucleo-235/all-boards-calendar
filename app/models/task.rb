@@ -41,7 +41,8 @@ class Task < ActiveRecord::Base
       event.ip_class = "PUBLIC"
       event.created = self.created_at
       event.last_modified = self.updated_at
-      event.uid = event.url = "#{ENV['HOST_URL']}/#{self.project.user.uid}/events/#{self.id}"
+      event.uid = "#{self.id}"
+      event.url = self.external_url ? self.external_url : "#{ENV['HOST_URL']}/#{self.project.user.uid}/events/#{self.id}"
       # event.add_comment("AF83 - Shake your digital, we do WowWare")
       event
     end
