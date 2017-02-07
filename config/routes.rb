@@ -8,14 +8,15 @@ Rails.application.routes.draw do
     registrations:  'overrides/registrations',
     omniauth_callbacks:  'overrides/omniauth_callbacks'
   }
-  
+
   scope :api do
     scope :v1 do
       get 'me', to: 'users#me'
+      get 'calendar/:uid/mine', to: 'tasks#calendar', as: 'my_calendar'
 
       resources :tasks, only: [:index, :show, :update]
 
-      resources :users do 
+      resources :users do
         get 'update_image', on: :collection
       end
     end
@@ -23,7 +24,7 @@ Rails.application.routes.draw do
 
   require 'sidekiq/web'
   mount Sidekiq::Web, at: '/sidekiq-dashboard'
-  
+
   # resources :services, only: [ :create, :update, :destroy ]
   # resources :work_contacts, only: [:create], :path => "trabalhe_conosco"
   # resources :general_contacts, only: [:create], :path => "contato"

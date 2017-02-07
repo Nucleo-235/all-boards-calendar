@@ -17,6 +17,8 @@
 #  trello_list_id :string
 #  last_synced_at :datetime
 #  external_url   :string
+#  start_date     :datetime
+#  all_day        :boolean
 #
 
 class TrelloTask < Task
@@ -34,11 +36,25 @@ class TrelloTask < Task
       self.assigned = card.member_ids.length > 0
       self.trello_list_id = card.list_id
       self.external_url = card.url
+
+      self.parse_date
+
       self.save!
     ensure
       @trello_card = nil
     end
     self
+  end
+
+  def parse_date!
+    @trello_card = self
+
+    begin
+      self.parse_date
+      self.save!
+    ensure
+      @trello_card = nil
+    end
   end
 
   def self.create_with_card(project, card)

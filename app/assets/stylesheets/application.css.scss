@@ -27,3 +27,16 @@
     color: white;
   }
 }
+.main-container {
+  padding: 10px;
+  .tools {
+    padding: 10px;
+    padding-left: 0px;
+    .filters, .results {
+      display: inline-block;
+    }
+    .results {
+      padding-left: 10px;
+    }
+  }
+}

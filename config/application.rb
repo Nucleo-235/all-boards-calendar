@@ -36,5 +36,8 @@ module AllBoardsCalendar
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
     config.api_only = false
+
+    config.HOST_URL = (ENV["HOST_URL"] || 'localhost:3000')
+    config.LINK_HOST_URL = 'http://'+ config.HOST_URL
   end
 end

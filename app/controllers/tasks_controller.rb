@@ -1,15 +1,40 @@
 class TasksController < ApiController
-  # skip_before_action :authenticate_user!, only: [:index]
+  include ActionController::MimeResponds
+  skip_before_action :authenticate_user!, only: [:calendar]
   before_action :set_task, only: [:show, :update, :destroy]
 
   # GET /tasks
   # GET /tasks.json
+  # GET /tasks.ics
   def index
     @tasks = Task.joins(:project).where(projects: { user_id: current_user.id })
     @tasks = @tasks.where(due_date: (params[:startDate]..params[:endDate]))
     @tasks = @tasks.order(:due_date)
 
     render json: @tasks
+  end
+
+  def calendar
+    user = current_user || User.find_by(uid: params[:uid])
+    @tasks = Task.joins(:project).where(projects: { user_id: user.id })
+    @tasks = @tasks.where(due_date: (params[:startDate]..params[:endDate])) if params[:startDate] && params[:endDate]
+    @tasks = @tasks.order(:due_date)
+
+    respond_to do |wants|
+      wants.json do
+        render json: @tasks
+      end
+      wants.ics do
+        calendar = Icalendar::Calendar.new
+        @tasks.each do |task|
+          event = task.to_ics
+          # puts event.to_json
+          calendar.add_event(event) if event
+        end
+        calendar.publish
+        render text: calendar.to_ical, content_type: 'text/calendar'
+      end
+    end
   end
 
   # GET /tasks/1

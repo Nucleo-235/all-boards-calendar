@@ -1,4 +1,5 @@
-= render partial: 'projects/angular'
+.main-container
+  = render partial: 'projects/angular'
 
 - content_for :after_all
   = javascript_include_tag 'angular/app', 'data-turbolinks-track' => true

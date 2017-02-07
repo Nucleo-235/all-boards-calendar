@@ -1,3 +1,9 @@
-a ng-click="loginWithTrello()" ng-if="!isAuthenticated()" href="" Login
-a ng-click="refreshTasks()" ng-if="isAuthenticated()" href="" Atualizar Tarefas
+nav
+  a ng-click="loginWithTrello()" ng-if="!isAuthenticated()" href="" Login
+  a ng-click="refreshTasks()" ng-if="isAuthenticated()" href="" Atualizar Tarefas
+
 div ng-include="'tasks/list.html'"
+.extra
+  a ng-click="toggleICal()" href="" iCal
+  .iCal ng-show="showiCal"
+    | {{ "#{Rails.application.routes.url_helpers.my_calendar_url({host: AllBoardsCalendar::Application.config.LINK_HOST_URL, uid: '_UID_'})}".replace("_UID_", user.uid) }}

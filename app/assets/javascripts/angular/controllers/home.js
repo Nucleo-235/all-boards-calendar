@@ -99,66 +99,21 @@ angular.module('MyApp')
     };
     
     function taskToEvent(task) {
-      var due_moment = moment(task.due_date);
-      var allDay = false;
-      var startDate = moment(due_moment).toDate();
-      var endDate = moment(due_moment).add(1, 'h').toDate();
       // console.log(startDate);
       // console.log(endDate);
 
-      var event = { id: task.id, title: task.project_name + '\r\n' + task.name, description: task.description, url: task.external_url };
+      var event = { id: task.id,
+        title: task.project_name + '\r\n' + task.name,
+        start: moment(task.start_date).toDate(),
+        end: moment(task.due_date).toDate(),
+        allDay: task.all_day,
+        description: task.description,
+        url: task.external_url };
+
       if (task.completed)
         event.color = 'green';
 
-      var regexList = [
-        { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/g },
-        { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/g },
-        { property: "description", regex: /AllBoardsCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/g },
-        { property: "description", regex: /AllBoardsCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/g }
-      ];
-
-      var match = null;
-      var currentRegex = null;
-      while (regexList.length > 0 && (!match || match == null)) {
-        currentRegex = regexList[0];
-        regexList.splice(0, 1);
-
-        match = currentRegex.regex.exec(task[currentRegex.property]);;
-      }
-
-      if (match && (match.length == 4 || match.length == 3)) {
-        var delta = parseFloat(match[1]);
-        if (isNaN(delta))
-          delta = 1;
-
-        var deltaType = 'h';
-        if (match.length == 4) {
-          deltaType = match[2];
-          if (!deltaType || deltaType.length == 0)
-            deltaType = 'h';  
-        }
-        
-        var newName = task.name;
-        if (currentRegex.property == "name") {
-          if (match.length == 4) {
-            newName = match[3];
-          } else {
-            newName = match[2];
-          }
-        }
-
-        event.title = task.project_name + '\r\n' + newName;
-        if (delta > 0) {
-          endDate = moment(due_moment).add(delta, deltaType).toDate();
-        } else {
-          startDate = moment(due_moment).add(delta, deltaType).toDate();
-          endDate = moment(due_moment).toDate();  
-        }
-      }
-
-      event.start = startDate;
-      event.end = endDate;
-      event.allDay = moment(event.end).diff(moment(event.start), 'days', true) >= 1;
+      console.log(event);
 
       return event;
     };
@@ -226,6 +181,11 @@ angular.module('MyApp')
 
     $scope.refreshTasks = function() {
       reloadTasks();
+    };
+
+    $scope.showiCal = false;
+    $scope.toggleICal = function() {
+      $scope.showiCal = !$scope.showiCal;
     };
 
     $scope.newProject = function() {

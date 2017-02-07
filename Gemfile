@@ -28,6 +28,7 @@ gem 'carrierwave_backgrounder'
 gem 'high_voltage', '~> 2.2.1' # gem para paginas estaticas
 # gem 'easing', '~> 0.1.0' # para ter calculos de easing no back-end
 gem 'mail_form'
+gem 'icalendar'
 
 # front-end engine
 gem 'slim'
