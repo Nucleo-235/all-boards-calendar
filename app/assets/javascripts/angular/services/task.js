@@ -8,6 +8,7 @@ angular.module('MyApp')
         serializer: railsSerializer(function () {
             this.serializeWith('due_date', 'dateSerializer');
             this.serializeWith('start_date', 'dateSerializer');
+            this.serializeWith('end_date', 'dateSerializer');
         })
       });
 

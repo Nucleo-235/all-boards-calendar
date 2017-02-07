@@ -19,6 +19,7 @@
 #  external_url   :string
 #  start_date     :datetime
 #  all_day        :boolean
+#  end_date       :datetime
 #
 
 require 'icalendar'
@@ -34,7 +35,7 @@ class Task < ActiveRecord::Base
     if self.start_date
       event = Icalendar::Event.new
       event.dtstart = Icalendar::Values::Date.new(self.start_date.strftime("%Y%m%dT%H%M%S"))
-      event.dtend = Icalendar::Values::Date.new(self.due_date.strftime("%Y%m%dT%H%M%S"))
+      event.dtend = Icalendar::Values::Date.new(self.end_date.strftime("%Y%m%dT%H%M%S"))
       event.summary = self.name
       event.description = self.description
       event.location = self.project.name
@@ -99,7 +100,7 @@ class Task < ActiveRecord::Base
       end
 
       self.start_date = startDate;
-      self.due_date = endDate;
+      self.end_date = endDate;
       self.all_day = (endDate - startDate) >= 1.day;
 
       # puts matched.to_json

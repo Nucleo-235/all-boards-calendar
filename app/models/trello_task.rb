@@ -19,6 +19,7 @@
 #  external_url   :string
 #  start_date     :datetime
 #  all_day        :boolean
+#  end_date       :datetime
 #
 
 class TrelloTask < Task

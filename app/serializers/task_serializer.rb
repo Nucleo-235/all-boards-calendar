@@ -19,10 +19,11 @@
 #  external_url   :string
 #  start_date     :datetime
 #  all_day        :boolean
+#  end_date       :datetime
 #
 
 class TaskSerializer < ActiveModel::Serializer
-  attributes :id, :type, :name, :description, :due_date, :start_date, :all_day, :completed, :assigned, :project_name, :external_url
+  attributes :id, :type, :name, :description, :due_date, :start_date, :end_date, :all_day, :completed, :assigned, :project_name, :external_url
 
   has_many :labels
 
