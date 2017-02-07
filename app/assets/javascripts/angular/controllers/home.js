@@ -25,6 +25,7 @@ angular.module('MyApp')
           console.log(event);
           console.log(delta);
           Task.get(event.id).then(function (task) {
+            var start_moment = moment(moment(task.due_date) + delta);
             var due_moment = moment(moment(task.due_date) + delta);
             task.due_date = due_moment.toDate();
             console.log(task);
@@ -104,8 +105,9 @@ angular.module('MyApp')
 
       var event = { id: task.id,
         title: task.project_name + '\r\n' + task.name,
-        start: moment(task.start_date).toDate(),
-        end: moment(task.due_date).toDate(),
+        start: task.start_date,
+        end: task.end_date,
+        due_date: task.due_date
         allDay: task.all_day,
         description: task.description,
         url: task.external_url };
