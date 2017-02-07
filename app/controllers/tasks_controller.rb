@@ -15,6 +15,7 @@ class TasksController < ApiController
   end
 
   def calendar
+    logger.info params
     user = current_user || User.find_by(uid: params[:uid])
     @tasks = Task.joins(:project).where(projects: { user_id: user.id })
     @tasks = @tasks.where(due_date: (params[:startDate]..params[:endDate])) if params[:startDate] && params[:endDate]
