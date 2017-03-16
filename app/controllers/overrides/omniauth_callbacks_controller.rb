@@ -20,12 +20,8 @@ module Overrides
     def get_resource_from_auth_hash
       @identity = Identity.find_for_oauth auth_hash
 
-      @resource = @identity.user || current_user || OrganizedPerson.new({
-        email: (@identity.email || ""),
-        provider: @identity.provider,
-        uid: (@identity.uid || @identity.email)
-      })
-      
+      @resource = @identity.user || current_user || new_user(@identity)
+
       if @resource.new_record?
         @oauth_registration = true
         set_random_password
@@ -39,6 +35,14 @@ module Overrides
       @resource.assign_attributes(extra_params) if extra_params
 
       @resource
+    end
+
+    def new_user(identity)
+      user = OrganizedPerson.new
+      user.email =  (@identity.email || "")
+      user.provider = @identity.provider
+      user.uid = (@identity.uid || @identity.email)
+      user
     end
 
   end

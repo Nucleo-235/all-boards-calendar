@@ -40,7 +40,7 @@ class Project < ActiveRecord::Base
   end
 
   def sync
-    
+
   end
 
   def self.sync_project(project_id)
