@@ -50,7 +50,7 @@ class ProjectDailySyncer
     set = Sidekiq::ScheduledSet.new
     jobs = set.select {|job| job.klass == 'ProjectDailySyncer' }
     if jobs.length == 0
-      interval = 10.minutes
+      interval = 60.minutes
       ProjectDailySyncer.perform_in(interval)
     end
   end

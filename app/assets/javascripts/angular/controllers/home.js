@@ -69,7 +69,7 @@ angular.module('MyApp')
         $interval(function() {
           console.log('interval reached');
           reloadTasks();
-        }, 10 * 60 * 1000);
+        }, 60 * 60 * 1000);
       }
     };
 
