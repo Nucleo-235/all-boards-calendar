@@ -7,6 +7,10 @@ class TasksController < ApiController
   # GET /tasks.json
   # GET /tasks.ics
   def index
+    if params[:retrieve].present? && to_boolean(params[:retrieve])
+      ProjectDailySyncer.sync_user(current_user.id)
+    end
+
     @tasks = Task.joins(:project).where(projects: { user_id: current_user.id })
     @tasks = @tasks.where(due_date: (params[:startDate]..params[:endDate]))
     @tasks = @tasks.order(:due_date)

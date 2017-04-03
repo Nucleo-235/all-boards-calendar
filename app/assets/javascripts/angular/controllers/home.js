@@ -69,7 +69,7 @@ angular.module('MyApp')
         $interval(function() {
           console.log('interval reached');
           reloadTasks();
-        }, 60 * 60 * 1000);
+        }, 120 * 60 * 1000);
       }
     };
 
@@ -131,9 +131,12 @@ angular.module('MyApp')
       return filteredEvents;
     };
 
-    function fillTasks(startDate, endDate) {
+    function fillTasks(startDate, endDate, forceRetrieve) {
       $scope.loadingEvents = true;
-      Task.query({startDate: startDate, endDate: endDate}).then(function(data) {
+      var params = { startDate: startDate, endDate: endDate };
+      if (forceRetrieve)
+        params.retrieve = forceRetrieve;
+      Task.query(params).then(function(data) {
         $scope.tasks = data;
         var events = $scope.tasks.map(function(item) {
           return taskToEvent(item);
@@ -160,8 +163,10 @@ angular.module('MyApp')
       });
     };
 
-    function reloadTasks(view) {
+    function reloadTasks(view, forceRetrieve) {
       console.log('reloadTasks reached');
+      if (forceRetrieve === undefined)
+        forceRetrieve = false;
 
       if (!view)
         view = uiCalendarConfig.calendars.tasksCalendar.fullCalendar('getView');
@@ -174,7 +179,7 @@ angular.module('MyApp')
         newStart = moment(view.intervalStart.toISOString()).local().toDate();
         newEnd = moment(view.intervalEnd.toISOString()).local().toDate();
       }
-      fillTasks(newStart, newEnd);
+      fillTasks(newStart, newEnd, forceRetrieve);
     }
 
     if ($scope.isAuthenticated()) {
@@ -184,7 +189,7 @@ angular.module('MyApp')
     }
 
     $scope.refreshTasks = function() {
-      reloadTasks();
+      reloadTasks(null, true);
     };
 
     $scope.showiCal = false;
