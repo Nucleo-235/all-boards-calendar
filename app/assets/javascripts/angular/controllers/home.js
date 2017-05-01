@@ -110,6 +110,9 @@ angular.module('MyApp')
         due_date: task.due_date,
         allDay: task.all_day,
         description: task.description,
+        name: task.name,
+        projectName: task.project_name,
+        periodHours: (moment(task.start_date).diff(moment(task.end_date), 'hours', true)),
         url: task.external_url };
 
       if (task.completed)
@@ -189,6 +192,7 @@ angular.module('MyApp')
     }
 
     $scope.refreshTasks = function() {
+      $scope.showTableResults = false;
       reloadTasks(null, true);
     };
 
