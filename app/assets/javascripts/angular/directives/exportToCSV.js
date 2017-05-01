@@ -30,8 +30,8 @@ angular.module('MyApp')
         });
       }
     }
-  })
-  .directive('exportListToCsv',function() {
+  }])
+  .directive('exportListToCsv', [function() {
     return {
       restrict: 'A',
       scope: {
@@ -72,4 +72,4 @@ angular.module('MyApp')
         });
       }
     }
-  })];
+  }]);
