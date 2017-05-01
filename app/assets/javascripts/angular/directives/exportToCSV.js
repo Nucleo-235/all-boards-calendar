@@ -35,7 +35,7 @@ angular.module('MyApp')
     return {
       restrict: 'A',
       scope: {
-            listAction: '&'
+            listAction: '&',
             attributeListMethod: '&'
         },
       link: function (scope, element, attrs) {
