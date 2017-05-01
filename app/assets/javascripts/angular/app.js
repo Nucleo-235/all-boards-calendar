@@ -11,7 +11,7 @@
 //= require angular-toastr/dist/angular-toastr.tpls.js
 //= require angular-cookie/angular-cookie.js
 //= require angular-bootstrap/ui-bootstrap-tpls.js
-//= require angular-i18n/angular-locale_pt-br.js
+// //= require angular-i18n/angular-locale_pt-br.js
 //= require ng-token-auth/dist/ng-token-auth.js
 //= require ng-file-upload/ng-file-upload-shim.js
 //= require ng-file-upload/ng-file-upload.js
