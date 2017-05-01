@@ -21,7 +21,8 @@
               th ID
               th Projeto
               th Nome
-              th Inicio
+              th Dia
+              th Hora
               th Duração
           tbody ng-repeat="event in events"
             tr
@@ -29,13 +30,14 @@
               td ng-bind="event.projectName"
               td
                 a href="{{event.url}}" target="_blank" ng-bind="event.name"
-              td ng-bind="event.start | date:'short'"
-              td ng-bind="event.periodHours | invariateNumber"
+              td style="text-align:right" ng-bind="event.start | date:'yyyy-MM-dd'"
+              td style="text-align:right" ng-bind="event.start | date:'HH:mm'"
+              td style="text-align:right" ng-bind="event.periodHours | invariateNumber"
           tfoot
             tr
               td colspan="3"
-              td Total:
-              td ng-bind="hoursSum | number:2"
+              td colspan="2" style="text-align:right" Total:
+              td style="text-align:right" ng-bind="hoursSum | number:2"
             tr
               td colspan="5"
                 button.btn.btn-info.pull-right export-table-to-csv="table#eventsTable" Exportar para CSV
