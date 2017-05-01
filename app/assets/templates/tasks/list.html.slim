@@ -30,7 +30,7 @@
                 a href="{{event.url}}" target="_blank" ng-bind="event.projectName"
               td ng-bind="event.name"
               td ng-bind="event.start | date:'short'"
-              td ng-bind="event.periodHours | number:2"
+              td ng-bind="event.periodHours | invariateNumber"
           tfoot
             tr
               td colspan="3"
