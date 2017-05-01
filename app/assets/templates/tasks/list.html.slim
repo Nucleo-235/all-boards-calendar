@@ -13,30 +13,30 @@
         .results
           p ng-show="hoursSum" Horas: {{ hoursSum | number:2 }}
     .row
-        .col.md-12 ng-init="showTableResults=false"
-          a ng-click="showTableResults = !showTableResults" href="" Tabela
-          table#eventsTable ng-if="showTableResults"
-            thead
-              tr
-                th ID
-                th Projeto
-                th Nome
-                th Descrição
-                th Inicio
-                th Duração
-            tbody ng-repeat="event in events"
-              tr
-                td ng-bind="event.id"
-                td ng-bind="event.projectName"
-                td ng-bind="event.name"
-                td ng-bind="event.description"
-                td ng-bind="event.start | date:'short'"
-                td ng-bind="event.periodHours | number:2"
-            tfoot
-              tr
-                td colspan="4"
-                td Total:
-                td ng-bind="hoursSum | number:2"
-              tr
-                td colspan="6"
-                  button.btn.btn-info export-table-to-csv="table#eventsTable" Exportar para CSV
+      .col-md-12 ng-init="showTableResults=false"
+        a ng-click="showTableResults = !showTableResults" href="" Tabela
+        table#eventsTable ng-if="showTableResults"
+          thead
+            tr
+              th ID
+              th Projeto
+              th Nome
+              th Descrição
+              th Inicio
+              th Duração
+          tbody ng-repeat="event in events"
+            tr
+              td ng-bind="event.id"
+              td ng-bind="event.projectName"
+              td ng-bind="event.name"
+              td ng-bind="event.description"
+              td ng-bind="event.start | date:'short'"
+              td ng-bind="event.periodHours | number:2"
+          tfoot
+            tr
+              td colspan="4"
+              td Total:
+              td ng-bind="hoursSum | number:2"
+            tr
+              td colspan="6"
+                button.btn.btn-info.pull-right export-table-to-csv="table#eventsTable" Exportar para CSV

@@ -29,6 +29,10 @@
 }
 .main-container {
   padding: 10px;
+  .tasks {
+    margin-bottom: 20px;
+  }
+
   .tools {
     padding: 10px;
     padding-left: 0px;
@@ -37,6 +41,11 @@
     }
     .results {
       padding-left: 10px;
+    }
+    #eventsTable {
+      td {
+        padding-right: 10px;
+      }
     }
   }
 }
