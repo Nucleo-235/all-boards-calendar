@@ -1,5 +1,5 @@
 angular.module('MyApp')
-  .directive('exportTableToCsv',function() {
+  .directive('exportTableToCsv', [function() {
     return {
       restrict: 'A',
       link: function (scope, element, attrs) {
@@ -72,4 +72,4 @@ angular.module('MyApp')
         });
       }
     }
-  });
+  })];
