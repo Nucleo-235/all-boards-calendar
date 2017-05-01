@@ -112,7 +112,7 @@ angular.module('MyApp')
         description: task.description,
         name: task.name,
         projectName: task.project_name,
-        periodHours: (moment(task.start_date).diff(moment(task.end_date), 'hours', true)),
+        periodHours: (moment(task.end_date).diff(moment(task.start_date), 'hours', true)),
         url: task.external_url };
 
       if (task.completed)
