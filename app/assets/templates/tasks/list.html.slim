@@ -26,9 +26,9 @@
           tbody ng-repeat="event in events"
             tr
               td ng-bind="event.id"
+              td ng-bind="event.projectName"
               td
-                a href="{{event.url}}" target="_blank" ng-bind="event.projectName"
-              td ng-bind="event.name"
+                a href="{{event.url}}" target="_blank" ng-bind="event.name"
               td ng-bind="event.start | date:'short'"
               td ng-bind="event.periodHours | invariateNumber"
           tfoot
