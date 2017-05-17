@@ -3,7 +3,7 @@ angular.module('MyApp')
     return function(input) {
       var myNumber = input;
       var int = Math.floor(myNumber);
-      var dec = Math.round(myNumber - int, 2);
-      return ("" + int) + (dec > 10 ? ('.' + dec) : ('.0' + dec));
+      var dec = Math.round((myNumber - int) * 100, 0);
+      return ("" + int) + (dec > 9 ? ('.' + dec) : ('.0' + dec));
     };
   }]);
