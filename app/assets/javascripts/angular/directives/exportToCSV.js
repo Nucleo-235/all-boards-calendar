@@ -9,7 +9,7 @@ angular.module('MyApp')
             e.preventDefault();
           } catch (ex) {}
 
-          var table = $(attrs.exportToCsv)[0];
+          var table = $(attrs.exportTableToCsv)[0];
           var csvString = '';
           for(var i=0; i<table.rows.length;i++){
             var rowData = table.rows[i].cells;
