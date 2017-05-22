@@ -14,6 +14,7 @@ angular.module('MyApp')
           center: 'title',
           right: 'today prev,next'
         },
+        slotMinutes: 15,
         nowIndicator:true,
         editable: true,
         eventClick: function(event) {
