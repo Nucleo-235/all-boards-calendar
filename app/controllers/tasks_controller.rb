@@ -1,3 +1,5 @@
+require 'icalendar/tzinfo'
+
 class TasksController < ApiController
   include ActionController::MimeResponds
   skip_before_action :authenticate_user!, only: [:calendar]
@@ -31,8 +33,13 @@ class TasksController < ApiController
       end
       wants.ics do
         calendar = Icalendar::Calendar.new
+        tzid = 'America/Sao_Paulo'
+        tz = TZInfo::Timezone.get tzid
+        timezone = tz.ical_timezone task.start_date
+        calendar.add_timezone timezone
+
         @tasks.each do |task|
-          event = task.to_ics
+          event = task.to_ics(tzid)
           # puts event.to_json
           calendar.add_event(event) if event
         end

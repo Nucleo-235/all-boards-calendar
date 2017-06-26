@@ -31,17 +31,17 @@ class Task < ActiveRecord::Base
 
   has_many :task_labels, dependent: :destroy
 
-  def to_ics
+  def to_ics(tzid = 'America/Sao_Paulo')
     if self.start_date && self.end_date
       event = Icalendar::Event.new
       # event.dtstart = Icalendar::Values::Date.new(self.start_date.strftime("%Y%m%dT%H%M%S"))
       # event.dtend = Icalendar::Values::Date.new(self.end_date.strftime("%Y%m%dT%H%M%S"))
       if self.all_day
-        event.dtstart = Icalendar::Values::Date.new(self.start_date.strftime("%Y%m%dT%H%M%S"))
-        event.dtend = Icalendar::Values::Date.new(self.end_date.strftime("%Y%m%dT%H%M%S"))
+        event.dtstart = Icalendar::Values::Date.new(self.start_date.strftime("%Y%m%dT%H%M%S"), 'tzid' => tzid)
+        event.dtend = Icalendar::Values::Date.new(self.end_date.strftime("%Y%m%dT%H%M%S"), 'tzid' => tzid)
       else
-        event.dtstart = Icalendar::Values::DateTime.new(self.start_date.strftime("%Y%m%dT%H%M%S"))
-        event.dtend = Icalendar::Values::DateTime.new(self.end_date.strftime("%Y%m%dT%H%M%S"))
+        event.dtstart = Icalendar::Values::DateTime.new(self.start_date.strftime("%Y%m%dT%H%M%S"), 'tzid' => tzid)
+        event.dtend = Icalendar::Values::DateTime.new(self.end_date.strftime("%Y%m%dT%H%M%S"), 'tzid' => tzid)
       end
       event.summary = self.name
       event.description = self.description
