@@ -34,9 +34,11 @@ class TasksController < ApiController
       wants.ics do
         calendar = Icalendar::Calendar.new
         tzid = 'America/Sao_Paulo'
-        tz = TZInfo::Timezone.get tzid
-        timezone = tz.ical_timezone task.start_date
-        calendar.add_timezone timezone
+        if @tasks.length > 0
+          tz = TZInfo::Timezone.get tzid
+          timezone = tz.ical_timezone @tasks.first.start_date
+          calendar.add_timezone timezone
+        end
 
         @tasks.each do |task|
           event = task.to_ics(tzid)
