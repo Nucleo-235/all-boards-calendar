@@ -23,7 +23,7 @@ require 'trello_utils'
 class TrelloProject < Project
   has_one :info, class_name: :TrelloProjectInfo, foreign_key: 'project_id', dependent: :destroy
   accepts_nested_attributes_for :info
-  
+
   validates_associated :info
   validates_presence_of :info
 
@@ -49,6 +49,8 @@ class TrelloProject < Project
 
     begin
       trello_board = Trello::Board.from_response user.trello_client.get("/boards/#{info.board_id}") if !trello_board || trello_board.id != info.board_id
+      self.name = trello_board.name
+      self.description = trello_board.description
       self.closed = trello_board.closed
       self.public = trello_board.prefs["permissionLevel"] && trello_board.prefs["permissionLevel"] == "public"
       self.last_synced_at = lastSync
@@ -77,7 +79,7 @@ class TrelloProject < Project
     # sync tasks
     existing_tasks = self.tasks.map { |e| e.id }
     member_id = user.trello_member.id
-    
+
     trello_cards.each do |trello_card|
       task = TrelloTask.sync_task(trello_card, self, member_id)
       existing_tasks.delete(task.id) if (task && existing_tasks.include?(task.id))
