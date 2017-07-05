@@ -58,9 +58,9 @@ angular.module('MyApp')
           console.log(event);
           console.log(delta);
           Task.get(event.id).then(function (task) {
-            task.start_date = event.start.toDate();
-            task.end_date = event.end.toDate();
-            task.due_date = event.end.toDate();
+            var due_moment = moment(moment(task.due_date) + delta);
+            task.end_date = due_moment.toDate();
+            task.due_date = task.end_date;
             // console.log(task);
             task.save().then(function(data) {
 
