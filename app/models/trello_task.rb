@@ -325,6 +325,8 @@ class TrelloTask < Task
         else
           newName = matched[2]
         end
+      elsif currentRegex[:property] == "description"
+        self.description = self.description.gsub(matched[0], "")
       end
       self.name = newName
 
@@ -336,7 +338,6 @@ class TrelloTask < Task
       end
     end
 
-    self.description = self.description.gsub(matched[0], "")
     self.start_date = startDate;
     self.end_date = endDate;
     self.all_day = (endDate - startDate) >= 1.day;
