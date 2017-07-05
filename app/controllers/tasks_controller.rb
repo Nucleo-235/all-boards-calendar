@@ -97,6 +97,6 @@ class TasksController < ApiController
     end
 
     def task_params
-      params.require(:task).permit(:project_id, :type, :name, :description, :due_date, :completed, :assigned, :trello_card_id)
+      params.require(:task).permit(:project_id, :type, :name, :description, :start_date, :end_date, :due_date, :completed, :assigned, :trello_card_id)
     end
 end

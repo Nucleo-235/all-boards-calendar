@@ -32,9 +32,9 @@ angular.module('MyApp')
             // console.log(task);
             task.save().then(function(data) {
 
-            }, function(error) { 
+            }, function(error) {
               revertFunc();
-            }) 
+            })
           });
         },
         eventMouseover: function(calEvent, jsEvent) {
@@ -54,12 +54,27 @@ angular.module('MyApp')
             $(this).css('z-index', 8);
             $('.tooltipevent').remove();
         },
+        eventResize: function( event, delta, revertFunc, jsEvent, ui, view ) {
+          console.log(event);
+          console.log(delta);
+          Task.get(event.id).then(function (task) {
+            task.start_date = event.start.toDate();
+            task.end_date = event.end.toDate();
+            task.due_date = event.end.toDate();
+            // console.log(task);
+            task.save().then(function(data) {
+
+            }, function(error) {
+              revertFunc();
+            })
+          });
+        },
         loading: function(bool) {
           $('#loading').toggle(bool);
         }
       }
     };
-    
+
     $scope.eventsSource = [];
 
     var intervalStarted = false;
@@ -99,7 +114,7 @@ angular.module('MyApp')
         return result;
       });
     };
-    
+
     function taskToEvent(task) {
       // console.log(startDate);
       // console.log(endDate);

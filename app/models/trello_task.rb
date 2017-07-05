@@ -79,7 +79,7 @@ class TrelloTask < Task
 
   def self.sync_task(trello_card, project, trello_member_id)
     lastSync = Time.new
-    
+
     # puts trello_card.inspect
     # logger.debug trello_card
 
@@ -112,7 +112,7 @@ class TrelloTask < Task
         task = project.tasks.find_by(type: TrelloTask.name, trello_card_id: trello_card.id)
         task.destroy if task
         # if task
-        #   task.update_with_card(trello_card) 
+        #   task.update_with_card(trello_card)
         #   TrelloTask.update_last_sync(task, lastSync)
         # end
       end
@@ -127,16 +127,19 @@ class TrelloTask < Task
   def trello_card
     Trello::Card.from_response project.user.trello_client.get("/cards/#{trello_card_id}")
   end
-  
+
   def check_to_update_card
     if !@trello_card
       begin
         @trello_card = self.trello_card
-        
+
         if @trello_card
-          if @trello_card.due != self.due_date
+          if @trello_card.due != self.due_date || (self.start_date && self.start_date_changed?) || (self.end_date && self.end_date_changed?)
             @trello_card.due = self.due_date
+            @trello_card.name = self.name
+            @trello_card.desc = self.description
             @trello_card.client = project.user.trello_client
+            process_dates(@trello_card)
             @trello_card.save
 
             TrelloTask.sync_task(@trello_card, self.project, self.project.user.trello_member.id)
@@ -146,6 +149,199 @@ class TrelloTask < Task
         @trello_card = nil
       end
     end
+  end
+
+  def process_dates(trello_card)
+    duration = 1
+    duration_type = "h"
+    if self.all_day
+      duration_type = "d"
+      duration = ( (self.end_date - self.start_date)/1.day ).floor.to_i
+    else
+      duration_minutes = ( (self.end_date - self.start_date)/1.minute )
+      only_minutes = duration_minutes.to_i % 60
+      if only_minutes == 40 || only_minutes == 20
+        duration = duration_minutes
+        duration_type = "m"
+      elsif only_minutes == 0 || only_minutes == 15 || only_minutes == 30 || only_minutes == 45
+        duration = duration_minutes / 60.0
+        duration_type = "h"
+      else
+        duration = duration_minutes
+        duration_type = "m"
+      end
+    end
+
+    if duration > 0 && (duration != 1 || duration_type != "h")
+      duration_s = sprintf("$%.2f", duration)
+      trello_card.desc = trello_card.desc + "\r\r[](ABCalendar=>Time:(#{duration}#{duration_type}))"
+    end
+  end
+
+  def parse_date
+    if due_date
+      parsed = try_parse_from_standard_format
+      parsed = try_parse_from_trellius_format if !parsed
+      parsed = try_parse_from_old_standard_format if !parsed
+    end
+    self
+  end
+
+  def try_parse_from_trellius_format
+    allDay = false
+    startDate = due_date.to_time
+    endDate = (due_date - 1.hour).to_time
+
+    regexList = [
+      { property: "description", regex: /!\[Trellius Data - DO NOT EDIT!\]\(\)\[\]\(\{"start":"(.*)","end":"(.*)"\}\)/ }
+    ]
+
+    matched = nil;
+    currentRegex = nil;
+    while regexList.length > 0 && (!matched || matched.nil? || matched.length == 0) do
+      currentRegex = regexList[0];
+      regexList.delete_at(0);
+
+      value = self[currentRegex[:property]]
+      matched = currentRegex[:regex].match(value)
+    end
+
+    if matched && matched.length == 3
+      # puts matched[0].to_s
+      # puts matched[1].to_s
+      # puts matched[2].to_s
+
+      startDate = matched[1].to_time
+      endDate = matched[2].to_time
+
+
+      self.all_day = (endDate == startDate && self.due_date == startDate);
+      self.start_date = startDate;
+      self.end_date = self.all_day ? endDate + 1.day : endDate;
+
+      self.description = self.description.gsub(matched[0], "")
+
+      return true
+    else
+      return false
+    end
+
+    return true
+  end
+
+  def try_parse_from_standard_format
+    allDay = false
+    startDate = (due_date - 1.hour).to_time
+    endDate = due_date.to_time
+
+    regexList = [
+      { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/ },
+      { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/ },
+      { property: "description", regex: /\[?\]?\(?ABCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)\)?(.*)/ },
+      { property: "description", regex: /\[?\]?\(?ABCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)\)\)?(.*)/ }
+    ]
+
+    matched = nil;
+    currentRegex = nil;
+    while regexList.length > 0 && (!matched || matched.nil? || matched.length == 0) do
+      currentRegex = regexList[0];
+      regexList.delete_at(0);
+
+      value = self[currentRegex[:property]]
+      matched = currentRegex[:regex].match(value)
+    end
+
+    if (matched && (matched.length == 4 || matched.length == 3))
+      delta = matched[1].to_f
+
+      deltaType = 'h';
+      if (matched.length == 4)
+        deltaType = matched[2]
+        deltaType = 'h' if (!deltaType || deltaType.length == 0)
+      end
+
+      newName = self.name;
+      if (currentRegex[:property] == "name")
+        if (matched.length == 4)
+          newName = matched[3]
+        else
+          newName = matched[2]
+        end
+      end
+      self.name = newName
+
+      if (delta > 0)
+        startDate = due_date - delta_to_time(delta, deltaType)
+      else
+        startDate = due_date + delta_to_time(delta, deltaType)
+      end
+
+      self.description = self.description.gsub(matched[0], "").strip
+      self.start_date = startDate;
+      self.end_date = endDate;
+      self.all_day = (endDate - startDate) >= 1.day;
+
+      return true
+    end
+
+    return false
+  end
+
+  def try_parse_from_old_standard_format
+    allDay = false
+    startDate = due_date.to_time
+    endDate = (due_date + 1.hour).to_time
+
+    regexList = [
+      { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/ },
+      { property: "name", regex: /\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/ },
+      { property: "description", regex: /AllBoardsCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)([hmd]?)\)(.*)/ },
+      { property: "description", regex: /AllBoardsCalendar=>Time:\(([-+]?[0-9]*\.?[0-9]+)\)(.*)/ }
+    ]
+
+    matched = nil;
+    currentRegex = nil;
+    while regexList.length > 0 && (!matched || matched.nil? || matched.length == 0) do
+      currentRegex = regexList[0];
+      regexList.delete_at(0);
+
+      value = self[currentRegex[:property]]
+      matched = currentRegex[:regex].match(value)
+    end
+
+    if (matched && (matched.length == 4 || matched.length == 3))
+      delta = matched[1].to_f
+
+      deltaType = 'h';
+      if (matched.length == 4)
+        deltaType = matched[2]
+        deltaType = 'h' if (!deltaType || deltaType.length == 0)
+      end
+
+      newName = self.name;
+      if (currentRegex[:property] == "name")
+        if (matched.length == 4)
+          newName = matched[3]
+        else
+          newName = matched[2]
+        end
+      end
+      self.name = newName
+
+      if (delta > 0)
+        endDate = due_date + delta_to_time(delta, deltaType)
+      else
+        startDate = due_date + delta_to_time(delta, deltaType)
+        endDate = due_date.to_time;
+      end
+    end
+
+    self.description = self.description.gsub(matched[0], "")
+    self.start_date = startDate;
+    self.end_date = endDate;
+    self.all_day = (endDate - startDate) >= 1.day;
+
+    return true
   end
 
   private
