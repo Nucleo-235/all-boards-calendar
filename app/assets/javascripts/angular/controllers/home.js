@@ -14,6 +14,7 @@ angular.module('MyApp')
           center: 'title',
           right: 'today prev,next'
         },
+        forceEventDuration: true,
         slotDuration: "00:15:00",
         nowIndicator:true,
         editable: true,
@@ -25,13 +26,26 @@ angular.module('MyApp')
         eventDrop: function(event, delta, revertFunc, jsEvent, ui, view) {
           console.log(event);
           console.log(delta);
-          Task.get(event.id).then(function (task) {
-            var start_moment = moment(moment(task.due_date) + delta);
-            var due_moment = moment(event.end + delta);
-            task.due_date = due_moment.toDate();
-            // console.log(task);
-            task.save().then(function(data) {
+          // alert(event.start_date);
+          // alert(event.end_date);
+          // alert(delta);
+          var start_moment = moment(moment(event.start_date) + delta);
+          var due_moment = moment(moment(event.end_date) + delta);
+          console.log(start_moment);
+          console.log(due_moment);
+          // alert(start_moment);
+          // alert(due_moment);
+          // alert(start_moment.toDate());
+          // alert(due_moment.toDate());
 
+          Task.get(event.id).then(function (task) {
+            task.start_date = start_moment.toDate();
+            task.end_date = due_moment.toDate();
+            task.due_date = due_moment.toDate();
+
+            task.save().then(function(data) {
+              event.start_date = start_moment;
+              event.end_date = due_moment;
             }, function(error) {
               revertFunc();
             })
@@ -57,13 +71,24 @@ angular.module('MyApp')
         eventResize: function( event, delta, revertFunc, jsEvent, ui, view ) {
           console.log(event);
           console.log(delta);
+
+          var start_moment = moment(event.start_date);
+          var due_moment = moment(moment(event.end_date) + delta);
+          console.log(start_moment);
+          console.log(due_moment);
+          // alert(start_moment);
+          // alert(due_moment);
+          // alert(start_moment.toDate());
+          // alert(due_moment.toDate());
+
           Task.get(event.id).then(function (task) {
-            var due_moment = moment(event.end + delta);
+            task.start_date = start_moment.toDate();
             task.end_date = due_moment.toDate();
             task.due_date = task.end_date;
             // console.log(task);
             task.save().then(function(data) {
-
+              event.start_date = start_moment;
+              event.end_date = due_moment;
             }, function(error) {
               revertFunc();
             })
@@ -122,7 +147,9 @@ angular.module('MyApp')
       var event = { id: task.id,
         title: task.project_name + '\r\n' + task.name,
         start: task.start_date,
+        start_date: task.start_date,
         end: task.end_date,
+        end_date: task.end_date,
         due_date: task.due_date,
         allDay: task.all_day,
         description: task.description,
