@@ -20,7 +20,8 @@ angular.module('MyApp')
         editable: true,
         eventClick: function(event) {
         // opens events in a popup window
-          window.open(event.url);
+          // window.open(event.url);
+          $scope.openTask(event);
           return false;
         },
         eventDrop: function(event, delta, revertFunc, jsEvent, ui, view) {
@@ -152,9 +153,10 @@ angular.module('MyApp')
         end_date: task.end_date,
         due_date: task.due_date,
         allDay: task.all_day,
+        all_day: task.all_day,
         description: task.description,
         name: task.name,
-        projectName: task.project_name,
+        project_name: task.project_name,
         periodHours: (moment(task.end_date).diff(moment(task.start_date), 'hours', true)),
         url: task.external_url };
 
@@ -244,19 +246,25 @@ angular.module('MyApp')
       $scope.showiCal = !$scope.showiCal;
     };
 
-    $scope.newProject = function() {
+    $scope.openTask = function(task) {
       var modalInstance = $uibModal.open({
         animation: true,
         size: 'lg',
-        templateUrl: 'projects/new.html',
-        controller: 'NewProjectCtrl'
+        templateUrl: 'tasks/modal.html',
+        controller: 'TaskModalCtrl',
+        resolve: {
+          currentTask: function() {
+            return task;
+          }
+        }
       });
 
-      modalInstance.result.then(function (newGroupRequest) {
-        alert('projeto criado com sucesso!');
-        reloadTasks();
+      modalInstance.result.then(function (deletedTask) {
+        if (deletedTask) {
+          reloadTasks();
+        }
       }, function () {
-        reloadTasks();
+        console.log('Modal dismissed at: ' + new Date());
       });
     }
 

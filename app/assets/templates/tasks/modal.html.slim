@@ -1,0 +1,38 @@
+.modal-header
+  h3.modal-title 
+    a href="{{task.url}}" target="_blank"
+      | {{ task.title }}
+.modal-body
+  div
+    .row
+      .col-xs-12
+        span style="display:block" URL
+        p
+          a href="{{task.url}}" target="_blank"
+            | {{ task.url }}
+    .row
+      .col-xs-6
+        span style="display:block" Inicio
+        p 
+          | {{ task.start_date }}
+      .col-xs-6
+        span style="display:block" Fim
+        p 
+          | {{ task.end_date }}
+    .row
+      .col-xs-12
+        span style="display:block" Projeto
+        p 
+          | {{ task.project_name }}
+    .row ng-if="task.description && task.description.length > 0"
+      .col-xs-12 
+        span style="display:block" Descrição
+        p 
+          | {{ task.description }}
+    .row
+      .col-xs.12
+        div style="padding:15px;"
+          a.btn.btn-warning type="button" href="" ng-click="delete()" Apagar
+
+.modal-footer
+  button.btn.btn-default type="button" ng-click="close()" Fechar

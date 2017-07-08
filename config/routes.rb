@@ -14,7 +14,7 @@ Rails.application.routes.draw do
       get 'me', to: 'users#me'
       get 'calendar/:uid/mine', to: 'tasks#calendar', as: 'my_calendar'
 
-      resources :tasks, only: [:index, :show, :update]
+      resources :tasks, only: [:index, :show, :update, :destroy]
 
       resources :users do
         get 'update_image', on: :collection
