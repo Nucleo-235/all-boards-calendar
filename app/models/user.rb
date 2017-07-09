@@ -57,7 +57,7 @@ class User < ActiveRecord::Base
   before_save :check_calendar_codes
 
   def check_calendar_codes
-    if !calendar_code
+    if !self.calendar_code
       valid_chars = [('a'..'z'), ('A'..'Z'), ('0'..'9')].map(&:to_a).flatten
       self.calendar_code  = (0...32).map { valid_chars[rand(valid_chars.length)] }.join
       self.calendar_public_code  = (0...32).map { valid_chars[rand(valid_chars.length)] }.join
