@@ -56,6 +56,33 @@ class Task < ActiveRecord::Base
     end
   end
 
+  def to_public_ics(tzid = 'America/Sao_Paulo')
+    if self.start_date && self.end_date
+      event = Icalendar::Event.new
+      # event.dtstart = Icalendar::Values::Date.new(self.start_date.strftime("%Y%m%dT%H%M%S"))
+      # event.dtend = Icalendar::Values::Date.new(self.end_date.strftime("%Y%m%dT%H%M%S"))
+      if self.all_day
+        event.dtstart = Icalendar::Values::Date.new(self.start_date.strftime("%Y%m%dT%H%M%S"), 'tzid' => tzid)
+        event.dtend = Icalendar::Values::Date.new(self.end_date.strftime("%Y%m%dT%H%M%S"), 'tzid' => tzid)
+      else
+        event.dtstart = Icalendar::Values::DateTime.new(self.start_date.strftime("%Y%m%dT%H%M%S"), 'tzid' => tzid)
+        event.dtend = Icalendar::Values::DateTime.new(self.end_date.strftime("%Y%m%dT%H%M%S"), 'tzid' => tzid)
+      end
+      event.summary = 'Ocupado'
+      event.description = ''
+      event.location = ''
+      # event.summary = self.name
+      # event.description = self.description
+      # event.location = self.project.name
+      event.ip_class = "PUBLIC"
+      event.created = self.created_at
+      event.last_modified = self.updated_at
+      # event.uid = "#{self.id}"
+      # event.url = self.external_url ? self.external_url : "#{ENV['HOST_URL']}/#{self.project.user.uid}/events/#{self.id}"
+      event
+    end
+  end
+
   def delta_to_time(delta, detalType)
     case detalType
       when 'h'

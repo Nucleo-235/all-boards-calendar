@@ -22,10 +22,25 @@ class TasksController < ApiController
 
   def calendar
     logger.info params
-    user = current_user || User.find_by(uid: params[:uid])
+    code = params[:code]
+    user = current_user || User.where('calendar_code = ? or calendar_public_code = ? or all_day_calendar_code = ? or all_day_calendar_public_code = ? or hour_calendar_code = ? or hour_calendar_public_code = ?', code, code, code, code, code, code).first
+
+    filter = Proc.new { |tasks| tasks }
+    if code == user.all_day_calendar_code || code == user.all_day_calendar_public_code
+      filter = Proc.new { |tasks| tasks.where(all_day: true) }
+    elsif code == user.hour_calendar_code || code == user.hour_calendar_public_code
+      filter = Proc.new { |tasks| tasks.where(all_day: false) }
+    end
+
     @tasks = Task.joins(:project).where(projects: { user_id: user.id })
     @tasks = @tasks.where(due_date: (params[:startDate]..params[:endDate])) if params[:startDate] && params[:endDate]
+    @tasks = filter.call(@tasks)
     @tasks = @tasks.order(:due_date)
+
+    task_ics_generator = Proc.new { |task, tzid| task.to_ics(tzid) }
+    if code == user.calendar_public_code || code == user.all_day_calendar_public_code || code == user.hour_calendar_public_code
+      task_ics_generator = Proc.new { |task, tzid| task.to_public_ics(tzid) }
+    end
 
     respond_to do |wants|
       wants.json do
@@ -41,7 +56,7 @@ class TasksController < ApiController
         end
 
         @tasks.each do |task|
-          event = task.to_ics(tzid)
+          event = task_ics_generator.call(task, tzid)
           # puts event.to_json
           calendar.add_event(event) if event
         end

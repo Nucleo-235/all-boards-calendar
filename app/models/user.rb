@@ -2,33 +2,39 @@
 #
 # Table name: users
 #
-#  id                     :integer          not null, primary key
-#  provider               :string           default("email"), not null
-#  uid                    :string           default(""), not null
-#  encrypted_password     :string           default(""), not null
-#  reset_password_token   :string
-#  reset_password_sent_at :datetime
-#  remember_created_at    :datetime
-#  sign_in_count          :integer          default(0), not null
-#  current_sign_in_at     :datetime
-#  last_sign_in_at        :datetime
-#  current_sign_in_ip     :string
-#  last_sign_in_ip        :string
-#  confirmation_token     :string
-#  confirmed_at           :datetime
-#  confirmation_sent_at   :datetime
-#  unconfirmed_email      :string
-#  name                   :string
-#  email                  :string
-#  nickname               :string
-#  social_image           :string
-#  image                  :string
-#  phone                  :string
-#  type                   :string
-#  tokens                 :json
-#  created_at             :datetime
-#  updated_at             :datetime
-#  last_synced_at         :datetime
+#  id                           :integer          not null, primary key
+#  provider                     :string           default("email"), not null
+#  uid                          :string           default(""), not null
+#  encrypted_password           :string           default(""), not null
+#  reset_password_token         :string
+#  reset_password_sent_at       :datetime
+#  remember_created_at          :datetime
+#  sign_in_count                :integer          default(0), not null
+#  current_sign_in_at           :datetime
+#  last_sign_in_at              :datetime
+#  current_sign_in_ip           :string
+#  last_sign_in_ip              :string
+#  confirmation_token           :string
+#  confirmed_at                 :datetime
+#  confirmation_sent_at         :datetime
+#  unconfirmed_email            :string
+#  name                         :string
+#  email                        :string
+#  nickname                     :string
+#  social_image                 :string
+#  image                        :string
+#  phone                        :string
+#  type                         :string
+#  tokens                       :json
+#  created_at                   :datetime
+#  updated_at                   :datetime
+#  last_synced_at               :datetime
+#  calendar_code                :string
+#  calendar_public_code         :string
+#  all_day_calendar_code        :string
+#  all_day_calendar_public_code :string
+#  hour_calendar_code           :string
+#  hour_calendar_public_code    :string
 #
 
 require 'trello'
@@ -41,12 +47,36 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
           :recoverable, :rememberable, :trackable,
           :confirmable, :omniauthable
-  
+
   has_many :identities, dependent: :destroy
   has_many :projects, dependent: :destroy
   has_many :tasks, through: :projects
-  
+
   has_one :user_preference, dependent: :destroy
+
+  before_save :check_calendar_codes
+
+  def check_calendar_codes
+    if !calendar_code
+      valid_chars = [('a'..'z'), ('A'..'Z'), ('0'..'9')].map(&:to_a).flatten
+      self.calendar_code  = (0...32).map { valid_chars[rand(valid_chars.length)] }.join
+      self.calendar_public_code  = (0...32).map { valid_chars[rand(valid_chars.length)] }.join
+      self.all_day_calendar_code  = (0...32).map { valid_chars[rand(valid_chars.length)] }.join
+      self.all_day_calendar_public_code  = (0...32).map { valid_chars[rand(valid_chars.length)] }.join
+      self.hour_calendar_code  = (0...32).map { valid_chars[rand(valid_chars.length)] }.join
+      self.hour_calendar_public_code  = (0...32).map { valid_chars[rand(valid_chars.length)] }.join
+    end
+  end
+
+  def regenerate_calendar_codes
+    self.calendar_code = nil
+    self.calendar_public_code = nil
+    self.all_day_calendar_code = nil
+    self.all_day_calendar_public_code = nil
+    self.hour_calendar_code = nil
+    self.hour_calendar_public_code = nil
+    self.save
+  end
 
   def masked_email
     if email && email.length > 5

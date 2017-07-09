@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   scope :api do
     scope :v1 do
       get 'me', to: 'users#me'
-      get 'calendar/:uid/mine', to: 'tasks#calendar', as: 'my_calendar'
+      get 'calendar/:code', to: 'tasks#calendar', as: 'calendar'
 
       resources :tasks, only: [:index, :show, :update, :destroy]
 

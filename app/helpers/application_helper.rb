@@ -9,4 +9,9 @@ module ApplicationHelper
   def should_show?(optional_string_value)
     @is_admin || !optional_string_value.blank?
   end
+
+  def calendar_url(url_helpers, host, property)
+    args = { code: '_C_', format: :ics, host: host }
+    "'#{url_helpers.calendar_url(args)}'.replace('_C_', user.#{property})"
+  end
 end
