@@ -215,10 +215,14 @@ class TrelloTask < Task
       endDate = matched[2].to_time
 
 
-      self.all_day = (endDate == startDate && self.due_date == startDate);
       self.start_date = startDate;
-      self.end_date = self.all_day ? endDate + 1.day : endDate;
-
+      if endDate == startDate && self.due_date == startDate
+        self.all_day = true
+        self.end_date = endDate + 1.day
+      else
+        self.all_day = (endDate - startDate) >= 1.day
+        self.end_date = endDate
+      end
       self.description = self.description.gsub(matched[0], "")
 
       return true
